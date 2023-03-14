@@ -4,14 +4,13 @@ import createHttpError from "http-errors"
 import { hashSync } from "bcrypt";
 import { User } from "../database/models/User";
 import { endpointResponse } from "../helpers/succes";
-import { sign } from "jsonwebtoken";
+import { codeToken } from "../helpers/tokenHelper";
 
 export const login = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
     try {
         const { JWTSECRET } = process.env
-        if(!JWTSECRET) return endpointResponse({res, code:500, "message":"Error del servidor"})
-        const token = sign(req.body.user, JWTSECRET)
-
+        if(JWTSECRET === undefined) return endpointResponse({res, code:500, "message":"Error del servidor"})
+        const token = await codeToken(req.body.user)
         return endpointResponse({res, code:200, message:"¡Usuario logueado!", body:{token}})
     } catch (error:any) {
         const httpError = createHttpError(

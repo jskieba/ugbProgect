@@ -7,7 +7,6 @@ import path from "path"
 import { dateNowTimestamp, dateZoneString } from "./helpers/helper"
 import morgan from "morgan"
 import { mongoosedb } from "./database/mongoDB"
-require("dotenv").config()
 export class Core {
 
     private http:http.Server|null

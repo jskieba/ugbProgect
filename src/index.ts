@@ -1,3 +1,4 @@
+require("dotenv").config()
 import { Core } from "./server";
 import indexRouter from "./routes/index.routes"
 import { endpointResponse } from "./helpers/succes";
