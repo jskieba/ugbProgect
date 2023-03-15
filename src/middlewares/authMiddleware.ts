@@ -17,7 +17,9 @@ export const loginChainVal = [
         .custom(async (value, { req }) => {
             if(req.body.user === undefined) return true
             if(compareSync(value, req.body.user.password)){
+                const userId = req.body.user._id
                 req.body.user = req.body.user.toObject()
+                req.body.user.userId = userId
                 delete req.body.user.cellphone
                 return true
             }

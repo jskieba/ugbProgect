@@ -27,7 +27,7 @@ const userSchema = new mongoose_1.Schema({
     "cellphone": { type: String, default: null },
     "rol": { type: String, enum: ["USER", "ADMIN"], default: "USER" },
     "position": { type: String, enum: ["FUNCIONARIO", "GERENTE", "JEFE", "DIRECTOR"], required: [true, "cargo requerido"] },
-    "document": { type: Number, unique: true, required: [true, "documento de identificacion requerido"] },
+    "document": { type: Number, min: 999999, max: 999999999, unique: true, required: [true, "documento de identificacion requerido"] },
     "email": { type: String, default: null },
     "mailBox": { type: [messagesSchema], default: [] },
     "contacts": { type: (Array), default: [], ref: "User" }

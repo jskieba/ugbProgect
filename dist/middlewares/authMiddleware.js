@@ -31,7 +31,9 @@ exports.loginChainVal = [
         if (req.body.user === undefined)
             return true;
         if ((0, bcrypt_1.compareSync)(value, req.body.user.password)) {
+            const userId = req.body.user._id;
             req.body.user = req.body.user.toObject();
+            req.body.user.userId = userId;
             delete req.body.user.cellphone;
             return true;
         }

@@ -14,6 +14,7 @@ import managerRouter from "./manager.routes"
 router.use("/api/v1/manager", managerRouter)
 
 import userRouter from "./user.routes"
-router.use("/apo/v1/user", userRouter)
+import { checkToken } from "../middlewares/checkTokenMiddleware";
+router.use("/api/v1/user", checkToken, userRouter)
 
 export default router

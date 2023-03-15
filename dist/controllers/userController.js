@@ -29,21 +29,39 @@ exports.userList = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(vo
         return next(httpError);
     }
 }));
-exports.selfInfoUser = (0, catchAsync_1.catchAsync)((_req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+exports.selfInfoUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Usuario logueado!", body: {} });
+        let user = req.body.token;
+        const findUser = yield User_1.User.findOne({ username: user.username });
+        const userId = findUser === null || findUser === void 0 ? void 0 : findUser._id.toString();
+        user = findUser === null || findUser === void 0 ? void 0 : findUser.toJSON();
+        const unreadMessages = findUser === null || findUser === void 0 ? void 0 : findUser.toObject().mailBox.reduce((count, mail) => {
+            mail.read ? count++ : null;
+            return count;
+        }, 0);
+        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Mi informacion!", body: Object.assign({ userId, contactCount: user.contacts.length, unreadMessages }, user) });
     }
     catch (error) {
         const httpError = (0, http_errors_1.default)(error.statusCode, `[Error retrieving User List] - [ user/list - GET]: ${error.message}`);
         return next(httpError);
     }
 }));
-exports.updateUser = (0, catchAsync_1.catchAsync)((_req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+exports.updateUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Usuario logueado!", body: {} });
+        const username = req.body.token.username;
+        const patchUser = {
+            "firstname": req.body.firstname,
+            "lastname": req.body.lastname,
+            "username": req.body.username,
+            "password": req.body.newPassword,
+            "email": req.body.email,
+            "cellphone": req.body.cellphone
+        };
+        const updatedUser = yield User_1.User.findOneAndUpdate({ username }, patchUser, { "new": false, "runValidators": true });
+        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Usuario actualizado!", body: { updatedUser } });
     }
     catch (error) {
-        const httpError = (0, http_errors_1.default)(error.statusCode, `[Error retrieving User List] - [ user/list - GET]: ${error.message}`);
+        const httpError = (0, http_errors_1.default)(error.statusCode, `[Error retrieving User Update] - [ user - PATCH]: ${error.message}`);
         return next(httpError);
     }
 }));

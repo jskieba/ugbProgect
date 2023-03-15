@@ -23,7 +23,7 @@ const userSchema = new Schema({
     "cellphone":{type:String, default:null},
     "rol":{type:String, enum:["USER", "ADMIN"], default:"USER"},
     "position":{type:String, enum:["FUNCIONARIO", "GERENTE", "JEFE", "DIRECTOR"], required:[true, "cargo requerido"]},
-    "document":{type:Number, unique:true, required:[true, "documento de identificacion requerido"]},
+    "document":{type:Number, min:999999, max:999999999,unique:true, required:[true, "documento de identificacion requerido"]},
     "email":{type:String, default:null},
     "mailBox":{type:[messagesSchema], default:[]},
     "contacts":{type:Array<Schema.Types.ObjectId>, default:[], ref:"User"}
@@ -33,6 +33,7 @@ const userSchema = new Schema({
 })
 
 import mongooseHidden from "mongoose-hidden"
+import { importanceTypes, userPositions, userRoles } from "../../interfaces/interfaces";
 userSchema.plugin(mongooseHidden(),{hidden:{password:true}})
 messagesSchema.plugin(mongooseHidden(),{ hidden:{deleted:true}})
 
@@ -43,8 +44,8 @@ export interface userDbInterface {
     lastname:String,
     password:String,
     cellphone:String|null,
-    rol:"USER" | "ADMIN",
-    position:"FUNCIONARIO" | "GERENTE" | "JEFE" | "DIRECTOR",
+    rol:userRoles,
+    position:userPositions,
     document:Number,
     email:String|null,
     mailBox:Array<messagesDbInterface>,
@@ -56,7 +57,7 @@ export interface messagesDbInterface {
     "to":String,
     "tittle":String,
     "body":String,
-    "importance":"importante" | "peligro" | "atencion" | "informativo" | "social",
+    "importance":importanceTypes,
     "read"?:Boolean,
     "deleted":Boolean
 }
