@@ -27,8 +27,12 @@ export const register = catchAsync(async (req:Request, res:Response, next:NextFu
         if(SALTBCRYPT === undefined) return true
         const newUser = {
             "username":req.body.username,
+            "firstname":req.body.firstname,
+            "lastname":req.body.lastname,
             "password":hashSync(req.body.password,parseInt(SALTBCRYPT)),
-            "position":req.body.position
+            "position":req.body.position,
+            "cellphone":req.body.cellphone,
+            "document":parseInt(req.body.document)
         }
         await User.create(newUser)
         return endpointResponse({res, code:202, message:"Usuario creado"})

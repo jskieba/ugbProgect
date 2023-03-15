@@ -17,6 +17,8 @@ const messagesSchema = new Schema({
 
 const userSchema = new Schema({
     "username":{type:String, unique:true, required:[true, "Nombre de usuario requerido"]},
+    "firstname":{type:String, required:[true, "primer nombre requerido"]},
+    "lastname":{type:String, required:[true, "apellido requerido"]},
     "password":{type:String, required:[true, "Contraseña requerida"]},
     "cellphone":{type:String, default:null},
     "rol":{type:String, enum:["USER", "ADMIN"], default:"USER"},
@@ -37,12 +39,14 @@ messagesSchema.plugin(mongooseHidden(),{ hidden:{deleted:true}})
 export const User = model("User",userSchema)
 export interface userDbInterface {
     username:String,
+    firstname:String,
+    lastname:String,
     password:String,
-    cellphone:String,
+    cellphone:String|null,
     rol:"USER" | "ADMIN",
     position:"FUNCIONARIO" | "GERENTE" | "JEFE" | "DIRECTOR",
     document:Number,
-    email:String,
+    email:String|null,
     mailBox:Array<messagesDbInterface>,
     contacts:Array<userDbInterface>
 }

@@ -21,6 +21,8 @@ const messagesSchema = new mongoose_1.Schema({
 });
 const userSchema = new mongoose_1.Schema({
     "username": { type: String, unique: true, required: [true, "Nombre de usuario requerido"] },
+    "firstname": { type: String, required: [true, "primer nombre requerido"] },
+    "lastname": { type: String, required: [true, "apellido requerido"] },
     "password": { type: String, required: [true, "Contraseña requerida"] },
     "cellphone": { type: String, default: null },
     "rol": { type: String, enum: ["USER", "ADMIN"], default: "USER" },

@@ -39,8 +39,12 @@ exports.register = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(vo
             return true;
         const newUser = {
             "username": req.body.username,
+            "firstname": req.body.firstname,
+            "lastname": req.body.lastname,
             "password": (0, bcrypt_1.hashSync)(req.body.password, parseInt(SALTBCRYPT)),
-            "position": req.body.position
+            "position": req.body.position,
+            "cellphone": req.body.cellphone,
+            "document": parseInt(req.body.document)
         };
         yield User_1.User.create(newUser);
         return (0, succes_1.endpointResponse)({ res, code: 202, message: "Usuario creado" });

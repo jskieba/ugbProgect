@@ -19,7 +19,7 @@ exports.loginChainVal = [
     (0, express_validator_1.body)("username")
         .notEmpty({ "ignore_whitespace": true }).withMessage("el campo 'username' no puede estar vacio").bail()
         .custom((value, { req }) => __awaiter(void 0, void 0, void 0, function* () {
-        const user = (yield User_1.User.findOne({ username: value }));
+        const user = (yield User_1.User.findOne({ username: value }).select({ contacts: 0, mailBox: 0, cellphone: 0, email: 0, document: 0 }));
         if (!user)
             throw new Error("Usuario inexistente");
         req.body.user = user;
@@ -62,5 +62,21 @@ exports.registerChainVal = [
         return true;
     }),
     (0, express_validator_1.body)("position")
-        .notEmpty({ ignore_whitespace: true }).withMessage("El campo 'position' no puede estar vacio")
+        .notEmpty({ ignore_whitespace: true }).withMessage("El campo 'position' no puede estar vacio").bail()
+        .isIn(["FUNCIONARIO", "GERENTE", "JEFE", "DIRECTOR"]).withMessage("El campo 'position' solo espera los valores : 'FUNCIONARIO', 'GERENTE', 'JEFE', 'DIRECTOR'"),
+    (0, express_validator_1.body)("document")
+        .notEmpty({ "ignore_whitespace": true }).withMessage("El campo 'document' no puede estar vacio").bail()
+        .custom((value) => __awaiter(void 0, void 0, void 0, function* () {
+        if (isNaN(parseInt(value)))
+            throw new Error("El campo 'document' debe ser un numero entero sin puntos ni comas");
+        if (!(value.length >= 7 && value.length <= 9))
+            throw new Error("El campo 'document' debe contener un dni valido");
+        if ((yield User_1.User.findOne({ document: value })) !== null)
+            throw new Error(`El documento ${value} ya esta registrado`);
+        return true;
+    })),
+    (0, express_validator_1.body)("firstname")
+        .notEmpty({ ignore_whitespace: true }).withMessage("El campo 'firstname' no puede estar vacio"),
+    (0, express_validator_1.body)("lastname")
+        .notEmpty({ ignore_whitespace: true }).withMessage("El campo 'lastname' no puede estar vacio")
 ];

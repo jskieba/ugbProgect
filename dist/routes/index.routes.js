@@ -13,4 +13,6 @@ const ugb_routes_1 = __importDefault(require("./ugb.routes"));
 router.use("/api/v1/ugb", ugb_routes_1.default);
 const manager_routes_1 = __importDefault(require("./manager.routes"));
 router.use("/api/v1/manager", manager_routes_1.default);
+const user_routes_1 = __importDefault(require("./user.routes"));
+router.use("/apo/v1/user", user_routes_1.default);
 exports.default = router;

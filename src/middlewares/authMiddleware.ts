@@ -7,7 +7,7 @@ export const loginChainVal = [
     body("username")
         .notEmpty({ "ignore_whitespace": true }).withMessage("el campo 'username' no puede estar vacio").bail()
         .custom(async (value, { req }) => {
-            const user = (await User.findOne({ username: value }))
+            const user = (await User.findOne({ username: value }).select({contacts:0, mailBox:0, cellphone:0, email:0, document:0}))
             if (!user) throw new Error("Usuario inexistente");
             req.body.user = user
             return true
@@ -50,5 +50,18 @@ export const registerChainVal = [
             return true
         }),
     body("position")
-        .notEmpty({ ignore_whitespace: true }).withMessage("El campo 'position' no puede estar vacio")
+        .notEmpty({ ignore_whitespace: true }).withMessage("El campo 'position' no puede estar vacio").bail()
+        .isIn(["FUNCIONARIO", "GERENTE", "JEFE", "DIRECTOR"]).withMessage("El campo 'position' solo espera los valores : 'FUNCIONARIO', 'GERENTE', 'JEFE', 'DIRECTOR'"),
+    body("document")
+        .notEmpty({"ignore_whitespace":true}).withMessage("El campo 'document' no puede estar vacio").bail()
+        .custom(async(value)=>{
+            if(isNaN(parseInt(value)))throw new Error("El campo 'document' debe ser un numero entero sin puntos ni comas");
+            if(!(value.length >= 7 && value.length <= 9)) throw new Error("El campo 'document' debe contener un dni valido");
+            if(await User.findOne({document:value}) !== null) throw new Error(`El documento ${value} ya esta registrado`);
+            return true
+        }),
+    body("firstname")
+        .notEmpty({ignore_whitespace:true}).withMessage("El campo 'firstname' no puede estar vacio"),
+    body("lastname")
+        .notEmpty({ignore_whitespace:true}).withMessage("El campo 'lastname' no puede estar vacio")
 ]
