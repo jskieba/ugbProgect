@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { deleteUser, selfInfoUser, updateUser, userDetail, userList } from "../controllers/userController";
-import { updateUserChain } from "../middlewares/userMiddleware";
+import { checkRol, updateUserChain } from "../middlewares/userMiddleware";
 import validationHandlerMiddleware from "../middlewares/validationHandlerMiddleware";
 const router = Router()
 
@@ -12,7 +12,7 @@ router.route("/")
 
 router.route("/:userId")
     .get(userDetail)
-    .patch(updateUser)
-    .delete(deleteUser)
+    .patch(checkRol(["ADMIN"]),updateUser)
+    .delete(checkRol(["ADMIN"]),deleteUser)
 
 export default router

@@ -63,10 +63,12 @@ export const updateUser = catchAsync(async (req:Request, res:Response, next:Next
     }
 })
 
-export const deleteUser = catchAsync(async (_req:Request, res:Response, next:NextFunction) => {
+export const deleteUser = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
     try {
+        const userId = req.params.userId 
+        const user = await User.findByIdAndDelete(userId)
 
-        return endpointResponse({res, code:200, message:"¡Usuario logueado!", body:{}})
+        return endpointResponse({res, code:200, message:"¡Usuario Eliminado con exito!", body:{user}})
     } catch (error:any) {
         const httpError = createHttpError(
             error.statusCode,
@@ -76,10 +78,11 @@ export const deleteUser = catchAsync(async (_req:Request, res:Response, next:Nex
     }
 })
 
-export const userDetail = catchAsync(async (_req:Request, res:Response, next:NextFunction) => {
+export const userDetail = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
     try {
-
-        return endpointResponse({res, code:200, message:"¡Usuario logueado!", body:{}})
+        const userId = req.params.userId
+        const user = await User.findById(userId).select({mailBox:0, contacts:0})
+        return endpointResponse({res, code:200, message:"¡Usuario logueado!", body:{user}})
     } catch (error:any) {
         const httpError = createHttpError(
             error.statusCode,
