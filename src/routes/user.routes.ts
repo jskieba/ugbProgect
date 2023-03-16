@@ -12,7 +12,7 @@ router.route("/")
 
 router.route("/:userId")
     .get(userDetail)
-    .patch(checkRol(["ADMIN"]),updateUser)
+    .patch(checkRol(["ADMIN"]), updateUserChain, validationHandlerMiddleware, updateUser)
     .delete(checkRol(["ADMIN"]),deleteUser)
 
 export default router

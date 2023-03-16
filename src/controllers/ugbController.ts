@@ -108,8 +108,8 @@ export const membersList = catchAsync(async (req:Request, res:Response, next:Nex
             "position":1,
             "email":1
         }
-        const ugb = (await Ugb.findById(ugbId).populate("members.user",memberSelect))
-        const members = ugb?.members
+        const ugb = (await Ugb.findById(ugbId).populate("members.user",memberSelect))!
+        const members = ugb.members
         return endpointResponse({res, code:200, message:"¡ Miembros de Ugb !", body:members})
     } catch (error:any) {
         const httpError = createHttpError(
@@ -123,9 +123,8 @@ export const membersList = catchAsync(async (req:Request, res:Response, next:Nex
 export const addMember = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
     try {
         const ugbId = req.params.ugbId
-        const ugb:any = await Ugb.findById(ugbId)
+        const ugb:any = (await Ugb.findById(ugbId))!
         
-        if(!ugb)return endpointResponse({res, code:400, message:"¡ UGB INEXISTENTE!"})
         if(ugb.toObject().members.length > 10)return endpointResponse({res, code:400, message:"¡ No se pueden agregar mas de 10 miembros por ugb!"})
 
         const memberId:string = req.body.memberId

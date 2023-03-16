@@ -11,7 +11,6 @@ const core = Core.instance;
 
         try {
             await core.start()
-
             //http handlers
             core.app.use(indexRouter)
 
@@ -19,8 +18,10 @@ const core = Core.instance;
                 return endpointResponse({ res, code: 404, message: "URL invalida" })
             })
 
-            core.app.use((err: Errback, _req: Request, res: Response, _next: NextFunction) => {
+            core.app.use((err:Errback|any, _req: Request, res: Response, _next: NextFunction) => {
+
                 console.error(err);
+                if(err.status === 400 && err.type === "entity.parse.failed") return endpointResponse({res, code:400, message:"JSON invalido"})
                 return endpointResponse({res, code:500, body:{ error: "Error interno del servidor." }})
             })
 
