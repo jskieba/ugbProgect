@@ -6,7 +6,7 @@ import { Schema, model } from "mongoose";
 
 const UgbSchema = new Schema({
     "area":{type:String, index:true, required:[true, "Es necesario un nombre para la UGB"]},
-    // "members":{type:Schema.Types.ObjectId, ref:"User", default:[]},
+    "members":{type:Array<{user:Schema.Types.ObjectId, leader:Boolean}>, ref:"User", default:[]},
     "manager":{type:Schema.Types.ObjectId, ref:"User", required:[true, "La ugb requiere un gerente a cargo"]},
     // "forum":{type:[PostSchema], default:[]}
 },{
@@ -20,3 +20,7 @@ export interface UgbInterface {
     members:Schema.Types.ObjectId[],
     manager:Schema.Types.ObjectId
 }
+
+// function arrayLimit(val:Array<any>) {
+//     return val.length <= 10;
+// }
