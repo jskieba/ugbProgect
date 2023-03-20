@@ -23,7 +23,7 @@ exports.ugbList = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(voi
     try {
         const limit = req.query.limit || "10";
         const page = req.query.page || "0";
-        const ugbs = yield Ugb_1.Ugb.findOne().limit(parseInt(limit)).skip(parseInt(page));
+        const ugbs = yield Ugb_1.Ugb.find().limit(parseInt(limit)).skip(parseInt(page));
         return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Lista de UGBS!", body: ugbs });
     }
     catch (error) {

@@ -1,13 +1,13 @@
 import { Router } from "express";
 import { addMember, createUgb, deleteMember, deleteUgb, membersList, ugbDetail, ugbList, updateMember, updateUgb } from "../controllers/ugbController";
-import { addMemberChain, checkUgdId, deleteMemberChain, queryChain } from "../middlewares/ugbMiddleware";
+import { addMemberChain, checkUgdId, deleteMemberChain, queryChain, ugbChain } from "../middlewares/ugbMiddleware";
 import validationHandlerMiddleware from "../middlewares/validationHandlerMiddleware";
 const router = Router()
 
 router.get("/list",queryChain, validationHandlerMiddleware, ugbList)
 
 router.route("/")
-    .post(createUgb)
+    .post(ugbChain, validationHandlerMiddleware, createUgb)
 
 router.route("/:ugbId")
     .get(checkUgdId, validationHandlerMiddleware, ugbDetail)

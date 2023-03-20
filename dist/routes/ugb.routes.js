@@ -10,7 +10,7 @@ const validationHandlerMiddleware_1 = __importDefault(require("../middlewares/va
 const router = (0, express_1.Router)();
 router.get("/list", ugbMiddleware_1.queryChain, validationHandlerMiddleware_1.default, ugbController_1.ugbList);
 router.route("/")
-    .post(ugbController_1.createUgb);
+    .post(ugbMiddleware_1.ugbChain, validationHandlerMiddleware_1.default, ugbController_1.createUgb);
 router.route("/:ugbId")
     .get(ugbMiddleware_1.checkUgdId, validationHandlerMiddleware_1.default, ugbController_1.ugbDetail)
     .patch(ugbMiddleware_1.checkUgdId, validationHandlerMiddleware_1.default, ugbController_1.updateUgb)

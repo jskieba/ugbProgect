@@ -9,7 +9,13 @@ export const userList = catchAsync(async (req:Request, res:Response, next:NextFu
         const limit:any = req.query.limit || "10"
         const page:any = req.query.page || "0"
 
-        const users = await User.find().limit(parseInt(limit)).skip(parseInt(page)).select({mailBox:0, contacts:0})
+        const users = (await User.find().limit(parseInt(limit)).skip(parseInt(page)).select({mailBox:0, contacts:0}))
+        .map(user=>{
+            return {
+                ...user.toJSON(),
+                userId:user._id.toString()
+            }
+        })
         return endpointResponse({res, code:200, message:"¡ Lista de usuarios !", body:{users}})
     } catch (error:any) {
         const httpError = createHttpError(

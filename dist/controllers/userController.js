@@ -21,7 +21,10 @@ exports.userList = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(vo
     try {
         const limit = req.query.limit || "10";
         const page = req.query.page || "0";
-        const users = yield User_1.User.find().limit(parseInt(limit)).skip(parseInt(page)).select({ mailBox: 0, contacts: 0 });
+        const users = (yield User_1.User.find().limit(parseInt(limit)).skip(parseInt(page)).select({ mailBox: 0, contacts: 0 }))
+            .map(user => {
+            return Object.assign(Object.assign({}, user.toJSON()), { userId: user._id.toString() });
+        });
         return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡ Lista de usuarios !", body: { users } });
     }
     catch (error) {

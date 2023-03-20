@@ -17,7 +17,7 @@ exports.ugbChain = [
     (0, express_validator_1.body)("area")
         .notEmpty().withMessage("El campo 'area' no puede estar vacio"),
     (0, express_validator_1.body)("manager")
-        .notEmpty().withMessage("El campo 'managet' no puede estar vacio").bail()
+        .notEmpty().withMessage("El campo 'manager' no puede estar vacio").bail()
         .custom((value) => __awaiter(void 0, void 0, void 0, function* () {
         const user = yield User_1.User.findById(value);
         if (!user)

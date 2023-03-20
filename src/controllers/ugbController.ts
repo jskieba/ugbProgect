@@ -11,7 +11,7 @@ export const ugbList = catchAsync(async (req:Request, res:Response, next:NextFun
         const limit:any = req.query.limit||"10"
         const page:any = req.query.page||"0"
 
-        const ugbs = await Ugb.findOne().limit(parseInt(limit)).skip(parseInt(page))
+        const ugbs = await Ugb.find().limit(parseInt(limit)).skip(parseInt(page))
         return endpointResponse({res, code:200, message:"¡Lista de UGBS!", body:ugbs})
     } catch (error:any) {
         console.log(error)
