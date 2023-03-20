@@ -5,15 +5,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const succes_1 = require("../helpers/succes");
+const checkTokenMiddleware_1 = require("../middlewares/checkTokenMiddleware");
 const router = (0, express_1.Router)();
 router.get("/api/v1", (_req, res) => (0, succes_1.endpointResponse)({ res, code: 200, status: true, message: "OK!" }));
 const auth_routes_1 = __importDefault(require("./auth.routes"));
 router.use("/api/v1/auth", auth_routes_1.default);
 const ugb_routes_1 = __importDefault(require("./ugb.routes"));
-router.use("/api/v1/ugb", ugb_routes_1.default);
+router.use("/api/v1/ugb", checkTokenMiddleware_1.checkToken, ugb_routes_1.default);
 const manager_routes_1 = __importDefault(require("./manager.routes"));
 router.use("/api/v1/manager", manager_routes_1.default);
 const user_routes_1 = __importDefault(require("./user.routes"));
-const checkTokenMiddleware_1 = require("../middlewares/checkTokenMiddleware");
 router.use("/api/v1/user", checkTokenMiddleware_1.checkToken, user_routes_1.default);
 exports.default = router;

@@ -19,10 +19,10 @@ const http_errors_1 = __importDefault(require("http-errors"));
 const User_1 = require("../database/models/User");
 exports.userList = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const limit = req.query.limit;
-        const page = req.query.page;
+        const limit = req.query.limit || "10";
+        const page = req.query.page || "0";
         const users = yield User_1.User.find().limit(parseInt(limit)).skip(parseInt(page)).select({ mailBox: 0, contacts: 0 });
-        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Usuario logueado!", body: { users } });
+        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡ Lista de usuarios !", body: { users } });
     }
     catch (error) {
         const httpError = (0, http_errors_1.default)(error.statusCode, `[Error retrieving User List] - [ user/list - GET]: ${error.message}`);
@@ -39,7 +39,7 @@ exports.selfInfoUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaite
             mail.read ? count++ : null;
             return count;
         }, 0);
-        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Mi informacion!", body: Object.assign({ userId, contactCount: user.contacts.length, unreadMessages }, user) });
+        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Mi informacion!", body: Object.assign({ userId, contactAmount: user.contacts.length, unreadMessages }, user) });
     }
     catch (error) {
         const httpError = (0, http_errors_1.default)(error.statusCode, `[Error retrieving User List] - [ user/list - GET]: ${error.message}`);
@@ -48,7 +48,7 @@ exports.selfInfoUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaite
 }));
 exports.updateUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const username = req.body.token.username;
+        const username = req.params.username || req.body.token.username;
         const patchUser = {
             "firstname": req.body.firstname,
             "lastname": req.body.lastname,
@@ -65,18 +65,22 @@ exports.updateUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(
         return next(httpError);
     }
 }));
-exports.deleteUser = (0, catchAsync_1.catchAsync)((_req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+exports.deleteUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Usuario logueado!", body: {} });
+        const username = req.params.username;
+        const user = yield User_1.User.findOne({ username });
+        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Usuario Eliminado con exito!", body: { user } });
     }
     catch (error) {
         const httpError = (0, http_errors_1.default)(error.statusCode, `[Error retrieving User List] - [ user/list - GET]: ${error.message}`);
         return next(httpError);
     }
 }));
-exports.userDetail = (0, catchAsync_1.catchAsync)((_req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+exports.userDetail = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Usuario logueado!", body: {} });
+        const username = req.params.username;
+        const user = yield User_1.User.findOne({ username }).select({ mailBox: 0, contacts: 0 });
+        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Usuario logueado!", body: { user } });
     }
     catch (error) {
         const httpError = (0, http_errors_1.default)(error.statusCode, `[Error retrieving User List] - [ user/list - GET]: ${error.message}`);

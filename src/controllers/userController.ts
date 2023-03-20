@@ -6,11 +6,11 @@ import { User } from "../database/models/User"
 
 export const userList = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
     try {
-        const limit:any = req.query.limit
-        const page:any = req.query.page
+        const limit:any = req.query.limit || "10"
+        const page:any = req.query.page || "0"
 
         const users = await User.find().limit(parseInt(limit)).skip(parseInt(page)).select({mailBox:0, contacts:0})
-        return endpointResponse({res, code:200, message:"¡Usuario logueado!", body:{users}})
+        return endpointResponse({res, code:200, message:"¡ Lista de usuarios !", body:{users}})
     } catch (error:any) {
         const httpError = createHttpError(
             error.statusCode,
@@ -30,7 +30,7 @@ export const selfInfoUser = catchAsync(async (req:Request, res:Response, next:Ne
             mail.read?count++:null
             return count
         },0)
-        return endpointResponse({res, code:200, message:"¡Mi informacion!", body:{userId, contactCount:user.contacts.length, unreadMessages,...user}})
+        return endpointResponse({res, code:200, message:"¡Mi informacion!", body:{userId, contactAmount:user.contacts.length, unreadMessages,...user}})
     } catch (error:any) {
         const httpError = createHttpError(
             error.statusCode,
@@ -42,7 +42,7 @@ export const selfInfoUser = catchAsync(async (req:Request, res:Response, next:Ne
 
 export const updateUser = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
     try {
-        const username = req.body.token.username
+        const username = req.params.username ||req.body.token.username
         const patchUser = {
             "firstname":req.body.firstname,
             "lastname":req.body.lastname,
@@ -65,8 +65,8 @@ export const updateUser = catchAsync(async (req:Request, res:Response, next:Next
 
 export const deleteUser = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
     try {
-        const userId = req.params.userId 
-        const user = await User.findByIdAndDelete(userId)
+        const username = req.params.username
+        const user = await User.findOne({username})
 
         return endpointResponse({res, code:200, message:"¡Usuario Eliminado con exito!", body:{user}})
     } catch (error:any) {
@@ -80,8 +80,8 @@ export const deleteUser = catchAsync(async (req:Request, res:Response, next:Next
 
 export const userDetail = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
     try {
-        const userId = req.params.userId
-        const user = await User.findById(userId).select({mailBox:0, contacts:0})
+        const username = req.params.username
+        const user = await User.findOne({username}).select({mailBox:0, contacts:0})
         return endpointResponse({res, code:200, message:"¡Usuario logueado!", body:{user}})
     } catch (error:any) {
         const httpError = createHttpError(

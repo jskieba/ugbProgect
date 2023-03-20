@@ -10,7 +10,7 @@ router.route("/")
     .get(selfInfoUser)
     .patch(updateUserChain, validationHandlerMiddleware, updateUser)
 
-router.route("/:userId")
+router.route("/:username")
     .get(userDetail)
     .patch(checkRol(["ADMIN"]), updateUserChain, validationHandlerMiddleware, updateUser)
     .delete(checkRol(["ADMIN"]),deleteUser)

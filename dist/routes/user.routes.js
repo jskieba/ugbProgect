@@ -12,8 +12,8 @@ router.get("/list", userController_1.userList);
 router.route("/")
     .get(userController_1.selfInfoUser)
     .patch(userMiddleware_1.updateUserChain, validationHandlerMiddleware_1.default, userController_1.updateUser);
-router.route("/:userId")
+router.route("/:username")
     .get(userController_1.userDetail)
-    .patch(userController_1.updateUser)
-    .delete(userController_1.deleteUser);
+    .patch((0, userMiddleware_1.checkRol)(["ADMIN"]), userMiddleware_1.updateUserChain, validationHandlerMiddleware_1.default, userController_1.updateUser)
+    .delete((0, userMiddleware_1.checkRol)(["ADMIN"]), userController_1.deleteUser);
 exports.default = router;

@@ -27,6 +27,8 @@ const core = server_1.Core.instance;
         });
         core.app.use((err, _req, res, _next) => {
             console.error(err);
+            if (err.status === 400 && err.type === "entity.parse.failed")
+                return (0, succes_1.endpointResponse)({ res, code: 400, message: "JSON invalido" });
             return (0, succes_1.endpointResponse)({ res, code: 500, body: { error: "Error interno del servidor." } });
         });
     }

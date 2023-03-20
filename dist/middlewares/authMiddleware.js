@@ -80,5 +80,7 @@ exports.registerChainVal = [
     (0, express_validator_1.body)("firstname")
         .notEmpty({ ignore_whitespace: true }).withMessage("El campo 'firstname' no puede estar vacio"),
     (0, express_validator_1.body)("lastname")
-        .notEmpty({ ignore_whitespace: true }).withMessage("El campo 'lastname' no puede estar vacio")
+        .notEmpty({ ignore_whitespace: true }).withMessage("El campo 'lastname' no puede estar vacio"),
+    (0, express_validator_1.body)("email").optional()
+        .isEmail().withMessage("El campo 'email' debe contener un correo valido")
 ];

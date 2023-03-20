@@ -29,6 +29,7 @@ const userSchema = new mongoose_1.Schema({
     "position": { type: String, enum: ["FUNCIONARIO", "GERENTE", "JEFE", "DIRECTOR"], required: [true, "cargo requerido"] },
     "document": { type: Number, min: 999999, max: 999999999, unique: true, required: [true, "documento de identificacion requerido"] },
     "email": { type: String, default: null },
+    "ugb": { type: mongoose_1.Schema.Types.ObjectId, ref: "Ugb", default: null },
     "mailBox": { type: [messagesSchema], default: [] },
     "contacts": { type: (Array), default: [], ref: "User" }
 }, {
