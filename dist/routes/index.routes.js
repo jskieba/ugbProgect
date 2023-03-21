@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const userMiddleware_1 = require("../middlewares/userMiddleware");
 const express_1 = require("express");
 const succes_1 = require("../helpers/succes");
 const checkTokenMiddleware_1 = require("../middlewares/checkTokenMiddleware");
@@ -15,6 +16,5 @@ router.use("/api/v1/ugb", checkTokenMiddleware_1.checkToken, ugb_routes_1.defaul
 const manager_routes_1 = __importDefault(require("./manager.routes"));
 router.use("/api/v1/manager", checkTokenMiddleware_1.checkToken, (0, userMiddleware_1.checkPosition)(["GERENTE"]), manager_routes_1.default);
 const user_routes_1 = __importDefault(require("./user.routes"));
-const userMiddleware_1 = require("../middlewares/userMiddleware");
 router.use("/api/v1/user", checkTokenMiddleware_1.checkToken, user_routes_1.default);
 exports.default = router;

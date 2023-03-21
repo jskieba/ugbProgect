@@ -1,3 +1,4 @@
+import { checkPosition } from "../middlewares/userMiddleware";
 import { Request, Response, Router } from "express";
 import { endpointResponse } from "../helpers/succes";
 import { checkToken } from "../middlewares/checkTokenMiddleware";
@@ -15,7 +16,6 @@ import managerRouter from "./manager.routes"
 router.use("/api/v1/manager", checkToken, checkPosition(["GERENTE"]), managerRouter)
 
 import userRouter from "./user.routes"
-import { checkPosition } from "../middlewares/userMiddleware";
 router.use("/api/v1/user", checkToken, userRouter)
 
 export default router
