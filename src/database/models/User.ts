@@ -26,6 +26,7 @@ const userSchema = new Schema({
     "document":{type:Number, min:999999, max:999999999,unique:true, required:[true, "documento de identificacion requerido"]},
     "email":{type:String, default:null},
     "ugb":{type:Schema.Types.ObjectId, ref:"Ugb", default:null},
+    "managin":{type:[Schema.Types.ObjectId], ref:"Ugb", default:[]},
     "mailBox":{type:[messagesSchema], default:[]},
     "contacts":{type:Array<Schema.Types.ObjectId>, default:[], ref:"User"}
 },{
