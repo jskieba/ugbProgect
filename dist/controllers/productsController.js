@@ -18,7 +18,7 @@ const http_errors_1 = __importDefault(require("http-errors"));
 const succes_1 = require("../helpers/succes");
 const Ugb_1 = require("../database/models/Ugb");
 const Product_1 = require("../database/models/Product");
-const mongoose_1 = require("mongoose");
+const mongoose_1 = __importDefault(require("mongoose"));
 //ONLY PRODUCTS
 //PRODUCTS IN UGB
 exports.ugbProductList = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -34,15 +34,16 @@ exports.ugbProductList = (0, catchAsync_1.catchAsync)((req, res, next) => __awai
     }
 }));
 exports.ugbProductDetail = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
     try {
         const ugbId = req.params.ugbId;
         const productId = req.params.productId;
-        const product = (_a = (yield Ugb_1.Ugb.findById(ugbId, { products: { $elemMatch: { product: new mongoose_1.Schema.Types.ObjectId(productId) } } }).populate("products.product"))) === null || _a === void 0 ? void 0 : _a.products[0];
+        const products = (yield Ugb_1.Ugb.findById(ugbId).populate("products.product")).products;
+        const product = products.find((prod) => prod._id == productId);
         return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡ Detalle de producto !", body: { product } });
     }
     catch (error) {
-        const httpError = (0, http_errors_1.default)(error.statusCode, `[Error retrieving ] - [ ]: ${error.message}`);
+        console.log(error);
+        const httpError = (0, http_errors_1.default)(error.statusCode, `[Error retrieving ] - [ ]: ${error}`);
         return next(httpError);
     }
 }));
@@ -50,7 +51,7 @@ exports.ugbProductAdd = (0, catchAsync_1.catchAsync)((req, res, next) => __await
     try {
         const ugbId = req.params.ugbId;
         const productId = req.body.productId;
-        const productName = req.body.productName;
+        const productName = req.body.name;
         const product = (yield Product_1.Product.findOne({ $or: [{ _id: productId }, { name: productName }] }));
         const newProduct = {
             product: product._id,
@@ -69,13 +70,13 @@ exports.ugbProductAdd = (0, catchAsync_1.catchAsync)((req, res, next) => __await
 exports.ugbProductUpdate = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const ugbId = req.params.ugbId;
-        const productId = req.body.productId;
+        const productId = req.params.productId;
         const updateProduct = {
             "products.$.period": req.body.period,
             "products.$.month": req.body.month,
-            "products.$.completed": req.body.completed
+            "products.$.completed": parseInt(req.body.completed)
         };
-        yield Ugb_1.Ugb.findOne({ _id: ugbId, "products.product": productId }, updateProduct);
+        yield Ugb_1.Ugb.findOneAndUpdate({ _id: ugbId, "products._id": new mongoose_1.default.Types.ObjectId(productId) }, updateProduct);
         return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Producto Actualizado!" });
     }
     catch (error) {
@@ -87,7 +88,7 @@ exports.ugbProductDelete = (0, catchAsync_1.catchAsync)((req, res, next) => __aw
     try {
         const ugbId = req.params.ugbId;
         const productId = req.params.productId;
-        yield Ugb_1.Ugb.findByIdAndUpdate(ugbId, { $pull: { "products": { "product": new mongoose_1.Schema.Types.ObjectId(productId) } } });
+        yield Ugb_1.Ugb.findByIdAndUpdate(ugbId, { $pull: { "products": { "_id": new mongoose_1.default.Types.ObjectId(productId) } } });
         return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡ Producto removido de la ugb !" });
     }
     catch (error) {
