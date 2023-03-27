@@ -11,7 +11,16 @@ export const ugbList = catchAsync(async (req:Request, res:Response, next:NextFun
         const limit:any = req.query.limit||"10"
         const page:any = req.query.page||"0"
 
-        const ugbs = await Ugb.find().limit(parseInt(limit)).skip(parseInt(page))
+        const memberSelect = {
+            "username":1, 
+            "firstname":1,
+            "lastname":1,
+            "rol":1,
+            "position":1,
+            "email":1
+        }
+
+        const ugbs = await Ugb.find().limit(parseInt(limit)).skip(parseInt(page)).populate("members.user",memberSelect)
         return endpointResponse({res, code:200, message:"¡Lista de UGBS!", body:ugbs})
     } catch (error:any) {
         console.log(error)
@@ -139,7 +148,7 @@ export const addMember = catchAsync(async (req:Request, res:Response, next:NextF
     } catch (error:any) {
         const httpError = createHttpError(
             error.statusCode,
-            `[Error retrieving UGB DELETE]: ${error.message}`
+            `[Error retrieving ADD Member]: ${error.message}`
         )
         return next(httpError)
     }
@@ -156,7 +165,7 @@ export const deleteMember = catchAsync(async (req:Request, res:Response, next:Ne
     } catch (error:any) {
         const httpError = createHttpError(
             error.statusCode,
-            `[Error retrieving UGB DELETE]: ${error.message}`
+            `[Error retrieving Member DELETE]: ${error.message}`
         )
         return next(httpError)
     }
@@ -177,7 +186,7 @@ export const updateMember = catchAsync(async (req:Request, res:Response, next:Ne
     } catch (error:any) {
         const httpError = createHttpError(
             error.statusCode,
-            `[Error retrieving UGB DELETE]: ${error.message}`
+            `[Error retrieving Update Member]: ${error.message}`
         )
         return next(httpError)
     }

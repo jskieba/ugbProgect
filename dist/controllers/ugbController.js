@@ -23,7 +23,15 @@ exports.ugbList = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(voi
     try {
         const limit = req.query.limit || "10";
         const page = req.query.page || "0";
-        const ugbs = yield Ugb_1.Ugb.find().limit(parseInt(limit)).skip(parseInt(page));
+        const memberSelect = {
+            "username": 1,
+            "firstname": 1,
+            "lastname": 1,
+            "rol": 1,
+            "position": 1,
+            "email": 1
+        };
+        const ugbs = yield Ugb_1.Ugb.find().limit(parseInt(limit)).skip(parseInt(page)).populate("members.user", memberSelect);
         return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Lista de UGBS!", body: ugbs });
     }
     catch (error) {
@@ -129,7 +137,7 @@ exports.addMember = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(v
         return (0, succes_1.endpointResponse)({ res, code: 201, message: "¡ miembro añadido a UGB !" });
     }
     catch (error) {
-        const httpError = (0, http_errors_1.default)(error.statusCode, `[Error retrieving UGB DELETE]: ${error.message}`);
+        const httpError = (0, http_errors_1.default)(error.statusCode, `[Error retrieving ADD Member]: ${error.message}`);
         return next(httpError);
     }
 }));
@@ -144,7 +152,7 @@ exports.deleteMember = (0, catchAsync_1.catchAsync)((req, res, next) => __awaite
         return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡ Miembro eliminado !" });
     }
     catch (error) {
-        const httpError = (0, http_errors_1.default)(error.statusCode, `[Error retrieving UGB DELETE]: ${error.message}`);
+        const httpError = (0, http_errors_1.default)(error.statusCode, `[Error retrieving Member DELETE]: ${error.message}`);
         return next(httpError);
     }
 }));
@@ -162,7 +170,7 @@ exports.updateMember = (0, catchAsync_1.catchAsync)((req, res, next) => __awaite
         return (0, succes_1.endpointResponse)({ res, code: 201, message: "¡ Miembro actualizado !" });
     }
     catch (error) {
-        const httpError = (0, http_errors_1.default)(error.statusCode, `[Error retrieving UGB DELETE]: ${error.message}`);
+        const httpError = (0, http_errors_1.default)(error.statusCode, `[Error retrieving Update Member]: ${error.message}`);
         return next(httpError);
     }
 }));

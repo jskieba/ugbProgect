@@ -16,7 +16,7 @@ export const userList = catchAsync(async (req:Request, res:Response, next:NextFu
                 userId:user._id.toString()
             }
         })
-        return endpointResponse({res, code:200, message:"¡ Lista de usuarios !", body:{users}})
+        return endpointResponse({res, code:200, message:"¡ Lista de usuarios !", body:{users, count:users.length}})
     } catch (error:any) {
         const httpError = createHttpError(
             error.statusCode,
@@ -40,7 +40,7 @@ export const selfInfoUser = catchAsync(async (req:Request, res:Response, next:Ne
     } catch (error:any) {
         const httpError = createHttpError(
             error.statusCode,
-            `[Error retrieving User List] - [ user/list - GET]: ${error.message}`
+            `[Error retrieving User Info] - [ user - GET]: ${error.message}`
         )
         return next(httpError)
     }
@@ -78,7 +78,7 @@ export const deleteUser = catchAsync(async (req:Request, res:Response, next:Next
     } catch (error:any) {
         const httpError = createHttpError(
             error.statusCode,
-            `[Error retrieving User List] - [ user/list - GET]: ${error.message}`
+            `[Error retrieving Delete User] - [ user - DELETE]: ${error.message}`
         )
         return next(httpError)
     }
@@ -88,11 +88,11 @@ export const userDetail = catchAsync(async (req:Request, res:Response, next:Next
     try {
         const username = req.params.username
         const user = await User.findOne({username}).select({mailBox:0, contacts:0})
-        return endpointResponse({res, code:200, message:"¡Usuario logueado!", body:{user}})
+        return endpointResponse({res, code:200, message:"¡ Detalle de Usuario!", body:{user}})
     } catch (error:any) {
         const httpError = createHttpError(
             error.statusCode,
-            `[Error retrieving User List] - [ user/list - GET]: ${error.message}`
+            `[Error retrieving User Detail] - [ user/id - GET]: ${error.message}`
         )
         return next(httpError)
     }

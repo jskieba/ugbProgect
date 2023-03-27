@@ -25,7 +25,7 @@ exports.userList = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(vo
             .map(user => {
             return Object.assign(Object.assign({}, user.toJSON()), { userId: user._id.toString() });
         });
-        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡ Lista de usuarios !", body: { users } });
+        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡ Lista de usuarios !", body: { users, count: users.length } });
     }
     catch (error) {
         const httpError = (0, http_errors_1.default)(error.statusCode, `[Error retrieving User List] - [ user/list - GET]: ${error.message}`);
@@ -45,7 +45,7 @@ exports.selfInfoUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaite
         return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Mi informacion!", body: Object.assign({ userId, contactAmount: user.contacts.length, unreadMessages }, user) });
     }
     catch (error) {
-        const httpError = (0, http_errors_1.default)(error.statusCode, `[Error retrieving User List] - [ user/list - GET]: ${error.message}`);
+        const httpError = (0, http_errors_1.default)(error.statusCode, `[Error retrieving User Info] - [ user - GET]: ${error.message}`);
         return next(httpError);
     }
 }));
@@ -75,7 +75,7 @@ exports.deleteUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(
         return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Usuario Eliminado con exito!", body: { user } });
     }
     catch (error) {
-        const httpError = (0, http_errors_1.default)(error.statusCode, `[Error retrieving User List] - [ user/list - GET]: ${error.message}`);
+        const httpError = (0, http_errors_1.default)(error.statusCode, `[Error retrieving Delete User] - [ user - DELETE]: ${error.message}`);
         return next(httpError);
     }
 }));
@@ -83,10 +83,10 @@ exports.userDetail = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(
     try {
         const username = req.params.username;
         const user = yield User_1.User.findOne({ username }).select({ mailBox: 0, contacts: 0 });
-        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Usuario logueado!", body: { user } });
+        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡ Detalle de Usuario!", body: { user } });
     }
     catch (error) {
-        const httpError = (0, http_errors_1.default)(error.statusCode, `[Error retrieving User List] - [ user/list - GET]: ${error.message}`);
+        const httpError = (0, http_errors_1.default)(error.statusCode, `[Error retrieving User Detail] - [ user/id - GET]: ${error.message}`);
         return next(httpError);
     }
 }));

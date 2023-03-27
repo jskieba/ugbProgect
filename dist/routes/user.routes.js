@@ -5,10 +5,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const userController_1 = require("../controllers/userController");
+const ugbMiddleware_1 = require("../middlewares/ugbMiddleware");
 const userMiddleware_1 = require("../middlewares/userMiddleware");
 const validationHandlerMiddleware_1 = __importDefault(require("../middlewares/validationHandlerMiddleware"));
 const router = (0, express_1.Router)();
-router.get("/list", userController_1.userList);
+router.get("/list", ugbMiddleware_1.queryChain, validationHandlerMiddleware_1.default, userController_1.userList);
 router.route("/")
     .get(userController_1.selfInfoUser)
     .patch(userMiddleware_1.updateUserChain, validationHandlerMiddleware_1.default, userController_1.updateUser);
