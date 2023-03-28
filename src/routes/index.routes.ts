@@ -5,6 +5,7 @@ import { checkToken } from "../middlewares/checkTokenMiddleware";
 const router = Router()
 
 router.get("/api/v1", (_req: Request, res: Response) => endpointResponse({ res, code: 200, status: true, message: "OK!" }))
+router.get("/api/v1/makeMeACoffe", (_req: Request, res: Response) => endpointResponse({ res, code:418, message:"No, because I'm a teapot"}))
 
 import authRouter from "./auth.routes"
 router.use("/api/v1/auth", authRouter)

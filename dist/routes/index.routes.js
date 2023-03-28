@@ -9,6 +9,7 @@ const succes_1 = require("../helpers/succes");
 const checkTokenMiddleware_1 = require("../middlewares/checkTokenMiddleware");
 const router = (0, express_1.Router)();
 router.get("/api/v1", (_req, res) => (0, succes_1.endpointResponse)({ res, code: 200, status: true, message: "OK!" }));
+router.get("/api/v1/makeMeACoffe", (_req, res) => (0, succes_1.endpointResponse)({ res, code: 418, message: "No, because I'm a teapot" }));
 const auth_routes_1 = __importDefault(require("./auth.routes"));
 router.use("/api/v1/auth", auth_routes_1.default);
 const ugb_routes_1 = __importDefault(require("./ugb.routes"));
