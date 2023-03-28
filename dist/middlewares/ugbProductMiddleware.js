@@ -9,10 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUgbProductChain = exports.addProdUgbChain = void 0;
+exports.checkProductId = exports.updateUgbProductChain = exports.addProdUgbChain = void 0;
 const express_validator_1 = require("express-validator");
 const mongoose_1 = require("mongoose");
 const Product_1 = require("../database/models/Product");
+const succes_1 = require("../helpers/succes");
 exports.addProdUgbChain = [
     (0, express_validator_1.body)("productId")
         .custom((value, { req }) => {
@@ -68,3 +69,18 @@ exports.updateUgbProductChain = [
         return true;
     })
 ];
+const checkProductId = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const productId = req.params.productId;
+    if ((0, mongoose_1.isObjectIdOrHexString)(productId)) {
+        if (yield Product_1.Product.findById(productId)) {
+            next();
+        }
+        else {
+            return (0, succes_1.endpointResponse)({ res, code: 200, message: "Producto inexistente" });
+        }
+    }
+    else {
+        return (0, succes_1.endpointResponse)({ res, code: 400, message: "id de producto invalido" });
+    }
+});
+exports.checkProductId = checkProductId;
