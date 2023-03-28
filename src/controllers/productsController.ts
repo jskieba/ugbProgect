@@ -8,14 +8,95 @@ import mongoose from "mongoose";
 
 //ONLY PRODUCTS
 
+export const productList = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
+    try {  
+        const limit:any = req.query.limit || "10"
+        const page:any = req.query.page || "0"
+        const count = await Product.count()
+        const products = await Product.find().limit(parseInt(limit)).skip(parseInt(page)*parseInt(limit))
+        return endpointResponse({res, code:200, message:"¡ Lista de productos !", body:{products, count}})
+    } catch (error:any) {
+        console.log(error)
+        const httpError = createHttpError(
+            error.statusCode,
+            `[Error retrieving ] - []: ${error}`
+        )
+        return next(httpError)
+    }
+})
 
-
+export const productDetail = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
+    try {  
+        const productId = req.params.productId
+        const product = await Product.findById(productId)
+        return endpointResponse({res, code:200, message:"¡ Detalle del producto !", body:{product}})
+    } catch (error:any) {
+        console.log(error)
+        const httpError = createHttpError(
+            error.statusCode,
+            `[Error retrieving ] - []: ${error}`
+        )
+        return next(httpError)
+    }
+})
+export const createProduct = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
+    try {  
+        const newProduct = {
+            "name":req.body.name,
+            "requirements":parseInt(req.body.requirements),
+            "controlItems":[]
+        }
+        await Product.create(newProduct)
+        return endpointResponse({res, code:200, message:"¡ Producto Creado !"})
+    } catch (error:any) {
+        console.log(error)
+        const httpError = createHttpError(
+            error.statusCode,
+            `[Error retrieving ] - []: ${error}`
+        )
+        return next(httpError)
+    }
+})
+export const updateProduct = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
+    try {  
+        const productId = req.params.productId
+        const updatedProduct = {
+            "name":req.body.name,
+            "requirements":parseInt(req.body.requirements)
+        }
+        await Product.findByIdAndUpdate(productId, updatedProduct)
+        return endpointResponse({res, code:200, message:"¡ Producto actualizado !"})
+    } catch (error:any) {
+        console.log(error)
+        const httpError = createHttpError(
+            error.statusCode,
+            `[Error retrieving ] - []: ${error}`
+        )
+        return next(httpError)
+    }
+})
+export const deleteProduct = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
+    try {  
+        const productId = req.params.productId
+        await Product.findByIdAndRemove(productId)
+        return endpointResponse({res, code:200, message:"¡ Producto Eliminado !"})
+    } catch (error:any) {
+        console.log(error)
+        const httpError = createHttpError(
+            error.statusCode,
+            `[Error retrieving ] - []: ${error}`
+        )
+        return next(httpError)
+    }
+})
 
 //PRODUCTS IN UGB
 export const ugbProductList = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
     try {  
+        const limit:any = req.query.limit||"10"
+        const page:any = req.query.page||"0"
         const ugbId = req.params.ugbId
-        const products:any = (await Ugb.findOne({_id:ugbId}).populate({path:"products.product",model:Product}))!.products
+        const products:any = (await Ugb.findOne({_id:ugbId}).limit(parseInt(limit)).skip(parseInt(page)*parseInt(limit)).populate({path:"products.product",model:Product}))!.products
         return endpointResponse({res, code:200, message:"¡ Lista de productos !", body:{products, count:products.length}})
     } catch (error:any) {
         console.log(error)

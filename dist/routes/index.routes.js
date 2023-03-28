@@ -17,4 +17,6 @@ const manager_routes_1 = __importDefault(require("./manager.routes"));
 router.use("/api/v1/manager", checkTokenMiddleware_1.checkToken, (0, userMiddleware_1.checkPosition)(["GERENTE"]), manager_routes_1.default);
 const user_routes_1 = __importDefault(require("./user.routes"));
 router.use("/api/v1/user", checkTokenMiddleware_1.checkToken, user_routes_1.default);
+const products_routes_1 = __importDefault(require("./products.routes"));
+router.use("/api/v1/products", checkTokenMiddleware_1.checkToken, products_routes_1.default);
 exports.default = router;

@@ -18,4 +18,7 @@ router.use("/api/v1/manager", checkToken, checkPosition(["GERENTE"]), managerRou
 import userRouter from "./user.routes"
 router.use("/api/v1/user", checkToken, userRouter)
 
+import productRouter from "./products.routes"
+router.use("/api/v1/products", checkToken, productRouter)
+
 export default router
