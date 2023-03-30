@@ -9,11 +9,11 @@ import { endpointResponse } from "../helpers/succes";
 export const ugbChain = [
     body("area")
         .notEmpty().withMessage("El campo 'area' no puede estar vacio"),
-    body("manager")
-        .notEmpty().withMessage("El campo 'manager' no puede estar vacio").bail()
+    body("boss")
+        .notEmpty().withMessage("El campo 'boss' no puede estar vacio").bail()
         .custom(async(value)=>{
             const user = await User.findById(value)
-            if(!user) throw new Error("El id de 'manager' no existe");
+            if(!user) throw new Error("El id de 'boss' no existe");
             return true
         })
 ]

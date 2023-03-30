@@ -3,6 +3,7 @@ import { catchAsync } from "../helpers/catchAsync"
 import { endpointResponse } from "../helpers/succes"
 import createHttpError from "http-errors"
 import { User } from "../database/models/User"
+import { cleanUserProfile } from "../helpers/helper"
 
 export const userList = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
     try {
@@ -11,8 +12,10 @@ export const userList = catchAsync(async (req:Request, res:Response, next:NextFu
 
         const users = (await User.find().limit(parseInt(limit)).skip(parseInt(page)).select({mailBox:0, contacts:0}))
         .map(user=>{
+            let cleanedUser:any = user.toJSON()
+            cleanedUser = cleanUserProfile(cleanedUser)
             return {
-                ...user.toJSON(),
+                ...cleanedUser,
                 userId:user._id.toString()
             }
         })
@@ -32,6 +35,7 @@ export const selfInfoUser = catchAsync(async (req:Request, res:Response, next:Ne
         const findUser = await User.findOne({username:user.username})
         const userId = findUser?._id.toString()
         user = findUser?.toJSON()
+        user = cleanUserProfile(user)
         const unreadMessages = findUser?.toObject().mailBox.reduce((count,mail)=>{
             mail.read?count++:null
             return count
@@ -87,8 +91,8 @@ export const deleteUser = catchAsync(async (req:Request, res:Response, next:Next
 export const userDetail = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
     try {
         const username = req.params.username
-        const user = await User.findOne({username}).select({mailBox:0, contacts:0})
-        return endpointResponse({res, code:200, message:"¡ Detalle de Usuario!", body:{user}})
+        const user:any = await User.findOne({username}).select({mailBox:0, contacts:0})
+        return endpointResponse({res, code:200, message:"¡ Detalle de Usuario!", body:{user:cleanUserProfile(user.toJSON())}})
     } catch (error:any) {
         const httpError = createHttpError(
             error.statusCode,

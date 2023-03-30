@@ -18,12 +18,12 @@ const succes_1 = require("../helpers/succes");
 exports.ugbChain = [
     (0, express_validator_1.body)("area")
         .notEmpty().withMessage("El campo 'area' no puede estar vacio"),
-    (0, express_validator_1.body)("manager")
-        .notEmpty().withMessage("El campo 'manager' no puede estar vacio").bail()
+    (0, express_validator_1.body)("boss")
+        .notEmpty().withMessage("El campo 'boss' no puede estar vacio").bail()
         .custom((value) => __awaiter(void 0, void 0, void 0, function* () {
         const user = yield User_1.User.findById(value);
         if (!user)
-            throw new Error("El id de 'manager' no existe");
+            throw new Error("El id de 'boss' no existe");
         return true;
     }))
 ];

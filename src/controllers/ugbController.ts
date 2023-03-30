@@ -43,7 +43,7 @@ export const ugbDetail = catchAsync(async (req:Request, res:Response, next:NextF
             "position":1,
             "email":1
         }
-        const ugb = await Ugb.findById(ugbDetail).populate("members.user",memberSelect).populate("manager",memberSelect)
+        const ugb = await Ugb.findById(ugbDetail).populate("members.user",memberSelect).populate("boss",memberSelect)
         return endpointResponse({res, code:200, message:"¡Usuario logueado!", body:ugb})
     } catch (error:any) {
         console.log(error)
@@ -60,7 +60,7 @@ export const updateUgb = catchAsync(async (req:Request, res:Response, next:NextF
         const ugbId = req.params.ugbId
         const ugbUpdated = {
             "area":req.body.area,
-            "manager":new mongoose.Types.ObjectId(req.body.manager)
+            "boss":new mongoose.Types.ObjectId(req.body.boss)
         }
         const ugb = await Ugb.findByIdAndUpdate(ugbId,ugbUpdated)
         return endpointResponse({res, code:200, message:"¡Usuario logueado!", body:ugb})
@@ -77,7 +77,7 @@ export const createUgb = catchAsync(async (req:Request, res:Response, next:NextF
     try {
         const ugbCreated={
             "area":req.body.area,
-            "manager":new mongoose.Types.ObjectId(req.body.manager)
+            "boss":new mongoose.Types.ObjectId(req.body.manager)
         }
         const ugb = await Ugb.create(ugbCreated)
         return endpointResponse({res, code:201, message:"¡ UGB Creada !", body:ugb})
@@ -139,10 +139,10 @@ export const addMember = catchAsync(async (req:Request, res:Response, next:NextF
         const memberId:string = req.body.memberId
         const leader:boolean = req.body.leader
         const user = await User.findById(memberId)
-        if(!user || user.ugb !== null) return endpointResponse({res, code:400, message:"¡ El miembro que quiere añadir ya esta asignado a otra ugb !"})
+        if(!user || user.FUNCIONARIO ) return endpointResponse({res, code:400, message:"¡ El miembro que quiere añadir ya esta asignado a otra ugb !"})
 
         await ugb.updateOne({"$push":{"members":{user:new mongoose.Types.ObjectId(memberId), leader}}})
-        await user.updateOne({"ugb":new mongoose.Types.ObjectId(ugbId)})
+        await user.updateOne({FUNCIONARIO:new mongoose.Types.ObjectId(ugbId)})
 
         return endpointResponse({res, code:201, message:"¡ miembro añadido a UGB !"})
     } catch (error:any) {
@@ -159,7 +159,7 @@ export const deleteMember = catchAsync(async (req:Request, res:Response, next:Ne
         const ugbId = req.params.ugbId
         const memberId:string = req.body.memberId
         const user = await User.findById(memberId)
-        if(user && user.ugb !== null && user.ugb.toString() === ugbId) await user.updateOne({ugb:null})
+        if(user && user.FUNCIONARIO && user.FUNCIONARIO.toString() === ugbId) await user.updateOne({FUNCIONARIO:null})
         await Ugb.findByIdAndUpdate(ugbId,{"$pull":{"members":{"user":new mongoose.Types.ObjectId(memberId)}}})
         return endpointResponse({res, code:200, message:"¡ Miembro eliminado !"})
     } catch (error:any) {

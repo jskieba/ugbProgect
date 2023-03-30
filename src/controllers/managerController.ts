@@ -7,7 +7,7 @@ import { User } from "../database/models/User";
 export const managerUgbList = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
     try {
         const user = req.body.token
-        const ugbs = (await User.findOne({username:user.username}).populate("managin"))?.managin
+        const ugbs = (await User.findOne({username:user.username}).populate("GERENTE"))?.GERENTE
         return endpointResponse({res, code:200, message:"¡Lista de UGBS a cargo!", body:ugbs})
     } catch (error:any) {
         console.log(error)

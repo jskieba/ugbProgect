@@ -21,7 +21,7 @@ exports.managerUgbList = (0, catchAsync_1.catchAsync)((req, res, next) => __awai
     var _a;
     try {
         const user = req.body.token;
-        const ugbs = (_a = (yield User_1.User.findOne({ username: user.username }).populate("managin"))) === null || _a === void 0 ? void 0 : _a.managin;
+        const ugbs = (_a = (yield User_1.User.findOne({ username: user.username }).populate("GERENTE"))) === null || _a === void 0 ? void 0 : _a.GERENTE;
         return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Lista de UGBS a cargo!", body: ugbs });
     }
     catch (error) {

@@ -5,6 +5,7 @@ import { hashSync } from "bcrypt";
 import { User } from "../database/models/User";
 import { endpointResponse } from "../helpers/succes";
 import { codeToken } from "../helpers/tokenHelper";
+import { userPositions } from "../interfaces/interfaces";
 
 export const login = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
     try {
@@ -25,7 +26,19 @@ export const register = catchAsync(async (req:Request, res:Response, next:NextFu
     try {
         const { SALTBCRYPT } = process.env
         if(SALTBCRYPT === undefined) return true
-        const newUser = {
+        let newUser:{
+            "username":string,
+            "firstname":string,
+            "lastname":string,
+            "password":string,
+            "position":userPositions,
+            "cellphone":string,
+            "document":number,
+            "FUNCIONARIO"?:string|null,
+            "JEFE"?:string|null,
+            "GERENTE"?:string|null,
+            "DIRECTOR"?:string|null
+        } = {
             "username":req.body.username,
             "firstname":req.body.firstname,
             "lastname":req.body.lastname,
@@ -34,6 +47,7 @@ export const register = catchAsync(async (req:Request, res:Response, next:NextFu
             "cellphone":req.body.cellphone,
             "document":parseInt(req.body.document)
         }
+        newUser[newUser.position] = null
         await User.create(newUser)
         return endpointResponse({res, code:202, message:"Usuario creado"})
     } catch (error:any) {
