@@ -44,7 +44,7 @@ export const ugbDetail = catchAsync(async (req:Request, res:Response, next:NextF
             "email":1
         }
         const ugb = await Ugb.findById(ugbDetail).populate("members.user",memberSelect).populate("boss",memberSelect)
-        return endpointResponse({res, code:200, message:"¡Usuario logueado!", body:ugb})
+        return endpointResponse({res, code:200, message:"¡Detalle de Ugb!", body:ugb})
     } catch (error:any) {
         console.log(error)
         const httpError = createHttpError(
@@ -62,8 +62,13 @@ export const updateUgb = catchAsync(async (req:Request, res:Response, next:NextF
             "area":req.body.area,
             "boss":new mongoose.Types.ObjectId(req.body.boss)
         }
-        const ugb = await Ugb.findByIdAndUpdate(ugbId,ugbUpdated)
-        return endpointResponse({res, code:200, message:"¡Usuario logueado!", body:ugb})
+        let ugb = (await Ugb.findById(ugbId))!
+        if(ugbUpdated.boss){
+            await User.findByIdAndUpdate(ugb.boss,{$pull:{JEFE:ugbId}})
+            await User.findByIdAndUpdate(ugb.boss,{$push:{JEFE:ugbId}})
+        }
+        const ugbUpdatedDb = await ugb.updateOne(ugbUpdated)
+        return endpointResponse({res, code:200, message:"¡UGB actualizada!", body:ugbUpdatedDb})
     } catch (error:any) {
         const httpError = createHttpError(
             error.statusCode,
@@ -80,6 +85,7 @@ export const createUgb = catchAsync(async (req:Request, res:Response, next:NextF
             "boss":new mongoose.Types.ObjectId(req.body.manager)
         }
         const ugb = await Ugb.create(ugbCreated)
+        await User.findByIdAndUpdate(req.body.manager,{"$push":{"JEFE":ugb._id}})
         return endpointResponse({res, code:201, message:"¡ UGB Creada !", body:ugb})
     } catch (error:any) {
         const httpError = createHttpError(
@@ -93,7 +99,14 @@ export const createUgb = catchAsync(async (req:Request, res:Response, next:NextF
 export const deleteUgb = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
     try {
         const ugbId = req.params.ugbId
-        await Ugb.findByIdAndDelete(ugbId)
+        const ugb = (await Ugb.findById(ugbId))!
+        const members = ugb.members
+        await User.updateMany(
+            {_id:{$in:members}},
+            {$set:{FUNCIONARIO:null}}
+            )
+        await User.findByIdAndUpdate(ugb.boss,{"$pull":{"JEFE":ugbId}})
+
         return endpointResponse({res, code:200, message:"¡ UGB Eliminada !"})
     } catch (error:any) {
         const httpError = createHttpError(

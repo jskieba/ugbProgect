@@ -16,8 +16,8 @@ router.route("/:ugbId")
     .get(ugbController_1.ugbDetail)
     .patch(ugbController_1.updateUgb)
     .delete(ugbController_1.deleteUgb);
-const members_routes_1 = __importDefault(require("./members.routes"));
+const members_routes_1 = __importDefault(require("./ugbRoutes/members.routes"));
 router.use("/:ugbId/members", members_routes_1.default);
-const ugbProduct_routes_1 = __importDefault(require("./ugbProduct.routes"));
+const ugbProduct_routes_1 = __importDefault(require("./ugbRoutes/ugbProduct.routes"));
 router.use("/:ugbId/products", ugbProduct_routes_1.default);
 exports.default = router;

@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { ugbProductAdd, ugbProductDelete, ugbProductDetail, ugbProductList, ugbProductUpdate } from "../controllers/productsController";
-import { addProdUgbChain } from "../middlewares/ugbProductMiddleware";
-import validationHandlerMiddleware from "../middlewares/validationHandlerMiddleware";
+import { ugbProductAdd, ugbProductDelete, ugbProductDetail, ugbProductList, ugbProductUpdate } from "../../controllers/productsController";
+import { addProdUgbChain } from "../../middlewares/ugbProductMiddleware";
+import validationHandlerMiddleware from "../../middlewares/validationHandlerMiddleware";
 const router = Router({"mergeParams":true})
 
 router.route("/")

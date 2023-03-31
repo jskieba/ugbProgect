@@ -15,10 +15,10 @@ router.route("/:ugbId")
     .patch(updateUgb)
     .delete(deleteUgb)
 
-import membersRouter from "./members.routes"
+import membersRouter from "./ugbRoutes/members.routes"
 router.use("/:ugbId/members",membersRouter)
 
-import ugbProductsRouter from "./ugbProduct.routes"
+import ugbProductsRouter from "./ugbRoutes/ugbProduct.routes"
 router.use("/:ugbId/products",ugbProductsRouter)
 
 

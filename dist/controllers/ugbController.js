@@ -52,7 +52,7 @@ exports.ugbDetail = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(v
             "email": 1
         };
         const ugb = yield Ugb_1.Ugb.findById(ugbDetail).populate("members.user", memberSelect).populate("boss", memberSelect);
-        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Usuario logueado!", body: ugb });
+        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Detalle de Ugb!", body: ugb });
     }
     catch (error) {
         console.log(error);
@@ -67,8 +67,13 @@ exports.updateUgb = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(v
             "area": req.body.area,
             "boss": new mongoose_1.default.Types.ObjectId(req.body.boss)
         };
-        const ugb = yield Ugb_1.Ugb.findByIdAndUpdate(ugbId, ugbUpdated);
-        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Usuario logueado!", body: ugb });
+        let ugb = (yield Ugb_1.Ugb.findById(ugbId));
+        if (ugbUpdated.boss) {
+            yield User_1.User.findByIdAndUpdate(ugb.boss, { $pull: { JEFE: ugbId } });
+            yield User_1.User.findByIdAndUpdate(ugb.boss, { $push: { JEFE: ugbId } });
+        }
+        const ugbUpdatedDb = yield ugb.updateOne(ugbUpdated);
+        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡UGB actualizada!", body: ugbUpdatedDb });
     }
     catch (error) {
         const httpError = (0, http_errors_1.default)(error.statusCode, `[Error retrieving UGB LIST] - [ ugb/list - GET]: ${error.message}`);
@@ -82,6 +87,7 @@ exports.createUgb = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(v
             "boss": new mongoose_1.default.Types.ObjectId(req.body.manager)
         };
         const ugb = yield Ugb_1.Ugb.create(ugbCreated);
+        yield User_1.User.findByIdAndUpdate(req.body.manager, { "$push": { "JEFE": ugb._id } });
         return (0, succes_1.endpointResponse)({ res, code: 201, message: "¡ UGB Creada !", body: ugb });
     }
     catch (error) {
@@ -92,7 +98,10 @@ exports.createUgb = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(v
 exports.deleteUgb = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const ugbId = req.params.ugbId;
-        yield Ugb_1.Ugb.findByIdAndDelete(ugbId);
+        const ugb = (yield Ugb_1.Ugb.findById(ugbId));
+        const members = ugb.members;
+        yield User_1.User.updateMany({ _id: { $in: members } }, { $set: { FUNCIONARIO: null } });
+        yield User_1.User.findByIdAndUpdate(ugb.boss, { "$pull": { "JEFE": ugbId } });
         return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡ UGB Eliminada !" });
     }
     catch (error) {
