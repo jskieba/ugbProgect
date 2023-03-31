@@ -25,7 +25,7 @@ exports.login = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 
         if (JWTSECRET === undefined)
             return (0, succes_1.endpointResponse)({ res, code: 500, "message": "Error del servidor" });
         const token = yield (0, tokenHelper_1.codeToken)(req.body.user);
-        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Usuario logueado!", body: { token } });
+        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Usuario logueado!", body: { token: "bearer " + token } });
     }
     catch (error) {
         const httpError = (0, http_errors_1.default)(error.statusCode, `[Error retrieving Login] - [ login - POST]: ${error.message}`);

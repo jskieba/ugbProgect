@@ -143,7 +143,6 @@ export const addMember = catchAsync(async (req:Request, res:Response, next:NextF
 
         await ugb.updateOne({"$push":{"members":{user:new mongoose.Types.ObjectId(memberId), leader}}})
         await user.updateOne({FUNCIONARIO:new mongoose.Types.ObjectId(ugbId)})
-
         return endpointResponse({res, code:201, message:"¡ miembro añadido a UGB !"})
     } catch (error:any) {
         const httpError = createHttpError(
