@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { allDataUgbsBoss } from "../../controllers/getAllDataControllers/bossController";
+import { allDataBossManager, allDataUgbManager } from "../../controllers/getAllDataControllers/managerController";
 const router = Router()
 
 
-router.get("/")
-router.get("/employees", allDataUgbsBoss)
+router.get("/", allDataBossManager)
+router.get("/employees", allDataUgbManager)
 
 
 export default router

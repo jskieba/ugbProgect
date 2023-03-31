@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const bossController_1 = require("../../controllers/getAllDataControllers/bossController");
+const managerController_1 = require("../../controllers/getAllDataControllers/managerController");
 const router = (0, express_1.Router)();
-router.get("/");
-router.get("/employees", bossController_1.allDataUgbsBoss);
+router.get("/", managerController_1.allDataBossManager);
+router.get("/employees", managerController_1.allDataUgbManager);
 exports.default = router;

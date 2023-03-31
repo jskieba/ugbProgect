@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { allDataBossDirector, allDataManagerDirector, allDataUgbsDirector } from "../../controllers/getAllDataControllers/directorController";
 const router = Router()
 
 //   manager
@@ -6,8 +7,8 @@ const router = Router()
 //   manager/boss/ugb
 //   manager/boss/ugb/employees
 
-router.get("/")
-router.get("/ugb")
-router.get("/ugb/employeer")
+router.get("/", allDataManagerDirector)
+router.get("/ugb", allDataBossDirector)
+router.get("/ugb/employeer", allDataUgbsDirector)
 
 export default router
