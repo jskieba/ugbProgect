@@ -11,7 +11,7 @@ export const login = catchAsync(async (req:Request, res:Response, next:NextFunct
         const { JWTSECRET } = process.env
         if(JWTSECRET === undefined) return endpointResponse({res, code:500, "message":"Error del servidor"})
         const token = await codeToken(req.body.user)
-        return endpointResponse({res, code:200, message:"¡Usuario logueado!", body:{token}})
+        return endpointResponse({res, code:200, message:"¡Usuario logueado!", body:{token:"Bearer "+token}})
     } catch (error:any) {
         const httpError = createHttpError(
             error.statusCode,
