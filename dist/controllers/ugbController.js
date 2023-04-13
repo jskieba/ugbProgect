@@ -51,8 +51,8 @@ exports.ugbDetail = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(v
             "position": 1,
             "email": 1
         };
-        const ugb = yield Ugb_1.Ugb.findById(ugbDetail).populate("members.user", memberSelect).populate("manager", memberSelect);
-        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Usuario logueado!", body: ugb });
+        const ugb = yield Ugb_1.Ugb.findById(ugbDetail).populate("members.user", memberSelect).populate("boss", memberSelect);
+        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Detalle de Ugb!", body: ugb });
     }
     catch (error) {
         console.log(error);
@@ -65,10 +65,15 @@ exports.updateUgb = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(v
         const ugbId = req.params.ugbId;
         const ugbUpdated = {
             "area": req.body.area,
-            "manager": new mongoose_1.default.Types.ObjectId(req.body.manager)
+            "boss": new mongoose_1.default.Types.ObjectId(req.body.boss)
         };
-        const ugb = yield Ugb_1.Ugb.findByIdAndUpdate(ugbId, ugbUpdated);
-        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Usuario logueado!", body: ugb });
+        let ugb = (yield Ugb_1.Ugb.findById(ugbId));
+        if (ugbUpdated.boss) {
+            yield User_1.User.findByIdAndUpdate(ugb.boss, { $pull: { JEFE: ugbId } });
+            yield User_1.User.findByIdAndUpdate(ugb.boss, { $push: { JEFE: ugbId } });
+        }
+        const ugbUpdatedDb = yield ugb.updateOne(ugbUpdated);
+        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡UGB actualizada!", body: ugbUpdatedDb });
     }
     catch (error) {
         const httpError = (0, http_errors_1.default)(error.statusCode, `[Error retrieving UGB LIST] - [ ugb/list - GET]: ${error.message}`);
@@ -79,9 +84,10 @@ exports.createUgb = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(v
     try {
         const ugbCreated = {
             "area": req.body.area,
-            "manager": new mongoose_1.default.Types.ObjectId(req.body.manager)
+            "boss": new mongoose_1.default.Types.ObjectId(req.body.manager)
         };
         const ugb = yield Ugb_1.Ugb.create(ugbCreated);
+        yield User_1.User.findByIdAndUpdate(req.body.manager, { "$push": { "JEFE": ugb._id } });
         return (0, succes_1.endpointResponse)({ res, code: 201, message: "¡ UGB Creada !", body: ugb });
     }
     catch (error) {
@@ -92,7 +98,10 @@ exports.createUgb = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(v
 exports.deleteUgb = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const ugbId = req.params.ugbId;
-        yield Ugb_1.Ugb.findByIdAndDelete(ugbId);
+        const ugb = (yield Ugb_1.Ugb.findById(ugbId));
+        const members = ugb.members;
+        yield User_1.User.updateMany({ _id: { $in: members } }, { $set: { FUNCIONARIO: null } });
+        yield User_1.User.findByIdAndUpdate(ugb.boss, { "$pull": { "JEFE": ugbId } });
         return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡ UGB Eliminada !" });
     }
     catch (error) {
@@ -130,10 +139,10 @@ exports.addMember = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(v
         const memberId = req.body.memberId;
         const leader = req.body.leader;
         const user = yield User_1.User.findById(memberId);
-        if (!user || user.ugb !== null)
+        if (!user || user.FUNCIONARIO)
             return (0, succes_1.endpointResponse)({ res, code: 400, message: "¡ El miembro que quiere añadir ya esta asignado a otra ugb !" });
         yield ugb.updateOne({ "$push": { "members": { user: new mongoose_1.default.Types.ObjectId(memberId), leader } } });
-        yield user.updateOne({ "ugb": new mongoose_1.default.Types.ObjectId(ugbId) });
+        yield user.updateOne({ FUNCIONARIO: new mongoose_1.default.Types.ObjectId(ugbId) });
         return (0, succes_1.endpointResponse)({ res, code: 201, message: "¡ miembro añadido a UGB !" });
     }
     catch (error) {
@@ -146,8 +155,8 @@ exports.deleteMember = (0, catchAsync_1.catchAsync)((req, res, next) => __awaite
         const ugbId = req.params.ugbId;
         const memberId = req.body.memberId;
         const user = yield User_1.User.findById(memberId);
-        if (user && user.ugb !== null && user.ugb.toString() === ugbId)
-            yield user.updateOne({ ugb: null });
+        if (user && user.FUNCIONARIO && user.FUNCIONARIO.toString() === ugbId)
+            yield user.updateOne({ FUNCIONARIO: null });
         yield Ugb_1.Ugb.findByIdAndUpdate(ugbId, { "$pull": { "members": { "user": new mongoose_1.default.Types.ObjectId(memberId) } } });
         return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡ Miembro eliminado !" });
     }

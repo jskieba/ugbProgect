@@ -25,7 +25,7 @@ exports.login = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 
         if (JWTSECRET === undefined)
             return (0, succes_1.endpointResponse)({ res, code: 500, "message": "Error del servidor" });
         const token = yield (0, tokenHelper_1.codeToken)(req.body.user);
-        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Usuario logueado!", body: { token: "Bearer " + token } });
+        return (0, succes_1.endpointResponse)({ res, code: 200, message: "¡Usuario logueado!", body: { token: "bearer " + token } });
     }
     catch (error) {
         const httpError = (0, http_errors_1.default)(error.statusCode, `[Error retrieving Login] - [ login - POST]: ${error.message}`);
@@ -37,7 +37,7 @@ exports.register = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(vo
         const { SALTBCRYPT } = process.env;
         if (SALTBCRYPT === undefined)
             return true;
-        const newUser = {
+        let newUser = {
             "username": req.body.username,
             "firstname": req.body.firstname,
             "lastname": req.body.lastname,
@@ -46,6 +46,7 @@ exports.register = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(vo
             "cellphone": req.body.cellphone,
             "document": parseInt(req.body.document)
         };
+        newUser[newUser.position] = null;
         yield User_1.User.create(newUser);
         return (0, succes_1.endpointResponse)({ res, code: 202, message: "Usuario creado" });
     }

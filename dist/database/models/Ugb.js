@@ -7,7 +7,7 @@ const mongoose_1 = require("mongoose");
 const UgbSchema = new mongoose_1.Schema({
     "area": { type: String, index: true, required: [true, "Es necesario un nombre para la UGB"] },
     "members": { type: (Array), ref: "User", default: [] },
-    "manager": { type: mongoose_1.Schema.Types.ObjectId, ref: "User", required: [true, "La ugb requiere un gerente a cargo"] },
+    "boss": { type: mongoose_1.Schema.Types.ObjectId, ref: "User", required: [true, "La ugb requiere un jefe a cargo"] },
     "products": { type: (Array), ref: "Product", default: [] }
     // "forum":{type:[PostSchema], default:[]}
 }, {

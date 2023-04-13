@@ -25,8 +25,10 @@ const userSchema = new Schema({
     "position":{type:String, enum:["FUNCIONARIO", "GERENTE", "JEFE", "DIRECTOR"], required:[true, "cargo requerido"]},
     "document":{type:Number, min:999999, max:999999999,unique:true, required:[true, "documento de identificacion requerido"]},
     "email":{type:String, default:null},
-    "ugb":{type:Schema.Types.ObjectId, ref:"Ugb", default:null},
-    "managin":{type:[Schema.Types.ObjectId], ref:"Ugb", default:[]},
+    "FUNCIONARIO":{type:Schema.Types.ObjectId, ref:"Ugb"},
+    "JEFE":{type:[Schema.Types.ObjectId], ref:"Ugb"},
+    "GERENTE":{type:[Schema.Types.ObjectId], ref:"User"},
+    "DIRECTOR":{type:[Schema.Types.ObjectId], ref:"User"},
     "mailBox":{type:[messagesSchema], default:[]},
     "contacts":{type:Array<Schema.Types.ObjectId>, default:[], ref:"User"}
 },{
@@ -51,7 +53,11 @@ export interface userDbInterface {
     document:Number,
     email:String|null,
     mailBox:Array<messagesDbInterface>,
-    contacts:Array<userDbInterface>
+    contacts:Array<userDbInterface>,
+    FUNCIONARIO?:String|null,
+    JEFE?:String[]|null,
+    GERENTE?:String[]|null,
+    DIRECTOR?:String[]|null
 }
 
 export interface messagesDbInterface {

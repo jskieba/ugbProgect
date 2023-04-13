@@ -1,4 +1,5 @@
 import moment from 'moment'
+import { userDbInterface } from '../database/models/User';
 
 export const countingHoursWorked = (dateStart: number, dateFinish: number) => moment.duration(moment(timestampToDate(dateStart, '')).diff(timestampToDate(dateFinish, ''))).asHours()
 export const calculateDifDate = (dateStart: number, dateFinish: number, type: string ) => { let hour = moment.duration(moment(timestampToDate(dateStart, '')).diff(timestampToDate(dateFinish, '')));  switch (type) { case 'days': return hour.asDays(); case 'hour': return hour.asHours(); case 'minutes': return hour.asMinutes(); case 'seconds': return hour.asSeconds(); default: return hour }}
@@ -13,3 +14,11 @@ export const dateIsAfter = (date: String, dateToCompare: String, format: String)
 export const dateZoneString = (date: number, format: string, timeZone: string): string => new Date(date * 1000).toLocaleString(format, { timeZone })
 
 export const isJSON = (str: any) => { try { JSON.parse(str) } catch (e) { return false } return true }
+
+export const cleanUserProfile = (user:userDbInterface)=>{
+    user.FUNCIONARIO && user.position=="FUNCIONARIO"?null:delete user.FUNCIONARIO;
+    user.JEFE && user.JEFE.length>0 && user.position=="JEFE"?null:delete user.JEFE;
+    user.GERENTE && user.GERENTE.length>0 && user.position=="GERENTE"?null:delete user.GERENTE;
+    user.DIRECTOR && user.DIRECTOR.length>0 && user.position=="DIRECTOR"?null:delete user.DIRECTOR;
+    return user
+}

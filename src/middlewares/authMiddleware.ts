@@ -7,7 +7,9 @@ export const loginChainVal = [
     body("username")
         .notEmpty({ "ignore_whitespace": true }).withMessage("el campo 'username' no puede estar vacio").bail()
         .custom(async (value, { req }) => {
-            const user = (await User.findOne({ username: value }).select({contacts:0, mailBox:0, cellphone:0, email:0, document:0}))
+            const user = (await User.findOne({ username: value }).select({
+                contacts:0, mailBox:0, cellphone:0, email:0, document:0, FUNCIONARIO:0, GERENTE:0, DIRECTOR:0, JEFE:0
+            }))
             if (!user) throw new Error("Usuario inexistente");
             req.body.user = user
             return true

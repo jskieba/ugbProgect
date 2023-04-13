@@ -1,16 +1,19 @@
-import { body, param, query } from "express-validator";
+import { NextFunction, Request, Response } from "express";
+import { body, query } from "express-validator";
+import { isObjectIdOrHexString } from "mongoose";
 import { Ugb } from "../database/models/Ugb";
 import { User } from "../database/models/User";
+import { endpointResponse } from "../helpers/succes";
 
 
 export const ugbChain = [
     body("area")
         .notEmpty().withMessage("El campo 'area' no puede estar vacio"),
-    body("manager")
-        .notEmpty().withMessage("El campo 'manager' no puede estar vacio").bail()
+    body("boss")
+        .notEmpty().withMessage("El campo 'boss' no puede estar vacio").bail()
         .custom(async(value)=>{
             const user = await User.findById(value)
-            if(!user) throw new Error("El id de 'manager' no existe");
+            if(!user) throw new Error("El id de 'boss' no existe");
             return true
         })
 ]
@@ -22,16 +25,19 @@ export const queryChain = [
         .isInt({"min":0}).withMessage("La query 'page' debe ser un numero entero mayor a 0(cero)")
 ]
 
-export const checkUgdId = [
-    param("ugbId")
-        .isHexadecimal().withMessage("Debe ser un mensaje exadecimal").bail()
-        .isLength({"min":24, "max":24}).withMessage("Debe contener 24 caracteres").bail()
-        .custom(async(value)=>{
-            const ugb = await Ugb.findById(value)
-            if(ugb === null) throw new Error("Ugb inexistente");
-            return true
-        })
-]
+
+export const checkUgbId =async (req:Request, res:Response, next:NextFunction) => {
+    const ugbId = req.params.ugbId
+    if(isObjectIdOrHexString(ugbId)){
+        if(await Ugb.findById(ugbId)){
+            next()
+        }else{
+            return endpointResponse({res, code:200, message:"Ugb inexistente"})
+        }
+    }else{
+        return endpointResponse({res, code:400, message:"id de Ugb invalido"})
+    }
+}
 
 export const addMemberChain = [
     body("memberId")

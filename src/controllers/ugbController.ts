@@ -43,8 +43,8 @@ export const ugbDetail = catchAsync(async (req:Request, res:Response, next:NextF
             "position":1,
             "email":1
         }
-        const ugb = await Ugb.findById(ugbDetail).populate("members.user",memberSelect).populate("manager",memberSelect)
-        return endpointResponse({res, code:200, message:"¡Usuario logueado!", body:ugb})
+        const ugb = await Ugb.findById(ugbDetail).populate("members.user",memberSelect).populate("boss",memberSelect)
+        return endpointResponse({res, code:200, message:"¡Detalle de Ugb!", body:ugb})
     } catch (error:any) {
         console.log(error)
         const httpError = createHttpError(
@@ -60,10 +60,15 @@ export const updateUgb = catchAsync(async (req:Request, res:Response, next:NextF
         const ugbId = req.params.ugbId
         const ugbUpdated = {
             "area":req.body.area,
-            "manager":new mongoose.Types.ObjectId(req.body.manager)
+            "boss":new mongoose.Types.ObjectId(req.body.boss)
         }
-        const ugb = await Ugb.findByIdAndUpdate(ugbId,ugbUpdated)
-        return endpointResponse({res, code:200, message:"¡Usuario logueado!", body:ugb})
+        let ugb = (await Ugb.findById(ugbId))!
+        if(ugbUpdated.boss){
+            await User.findByIdAndUpdate(ugb.boss,{$pull:{JEFE:ugbId}})
+            await User.findByIdAndUpdate(ugb.boss,{$push:{JEFE:ugbId}})
+        }
+        const ugbUpdatedDb = await ugb.updateOne(ugbUpdated)
+        return endpointResponse({res, code:200, message:"¡UGB actualizada!", body:ugbUpdatedDb})
     } catch (error:any) {
         const httpError = createHttpError(
             error.statusCode,
@@ -77,9 +82,10 @@ export const createUgb = catchAsync(async (req:Request, res:Response, next:NextF
     try {
         const ugbCreated={
             "area":req.body.area,
-            "manager":new mongoose.Types.ObjectId(req.body.manager)
+            "boss":new mongoose.Types.ObjectId(req.body.manager)
         }
         const ugb = await Ugb.create(ugbCreated)
+        await User.findByIdAndUpdate(req.body.manager,{"$push":{"JEFE":ugb._id}})
         return endpointResponse({res, code:201, message:"¡ UGB Creada !", body:ugb})
     } catch (error:any) {
         const httpError = createHttpError(
@@ -93,7 +99,14 @@ export const createUgb = catchAsync(async (req:Request, res:Response, next:NextF
 export const deleteUgb = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
     try {
         const ugbId = req.params.ugbId
-        await Ugb.findByIdAndDelete(ugbId)
+        const ugb = (await Ugb.findById(ugbId))!
+        const members = ugb.members
+        await User.updateMany(
+            {_id:{$in:members}},
+            {$set:{FUNCIONARIO:null}}
+            )
+        await User.findByIdAndUpdate(ugb.boss,{"$pull":{"JEFE":ugbId}})
+
         return endpointResponse({res, code:200, message:"¡ UGB Eliminada !"})
     } catch (error:any) {
         const httpError = createHttpError(
@@ -139,11 +152,10 @@ export const addMember = catchAsync(async (req:Request, res:Response, next:NextF
         const memberId:string = req.body.memberId
         const leader:boolean = req.body.leader
         const user = await User.findById(memberId)
-        if(!user || user.ugb !== null) return endpointResponse({res, code:400, message:"¡ El miembro que quiere añadir ya esta asignado a otra ugb !"})
+        if(!user || user.FUNCIONARIO ) return endpointResponse({res, code:400, message:"¡ El miembro que quiere añadir ya esta asignado a otra ugb !"})
 
         await ugb.updateOne({"$push":{"members":{user:new mongoose.Types.ObjectId(memberId), leader}}})
-        await user.updateOne({"ugb":new mongoose.Types.ObjectId(ugbId)})
-
+        await user.updateOne({FUNCIONARIO:new mongoose.Types.ObjectId(ugbId)})
         return endpointResponse({res, code:201, message:"¡ miembro añadido a UGB !"})
     } catch (error:any) {
         const httpError = createHttpError(
@@ -159,7 +171,7 @@ export const deleteMember = catchAsync(async (req:Request, res:Response, next:Ne
         const ugbId = req.params.ugbId
         const memberId:string = req.body.memberId
         const user = await User.findById(memberId)
-        if(user && user.ugb !== null && user.ugb.toString() === ugbId) await user.updateOne({ugb:null})
+        if(user && user.FUNCIONARIO && user.FUNCIONARIO.toString() === ugbId) await user.updateOne({FUNCIONARIO:null})
         await Ugb.findByIdAndUpdate(ugbId,{"$pull":{"members":{"user":new mongoose.Types.ObjectId(memberId)}}})
         return endpointResponse({res, code:200, message:"¡ Miembro eliminado !"})
     } catch (error:any) {

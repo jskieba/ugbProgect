@@ -19,7 +19,9 @@ exports.loginChainVal = [
     (0, express_validator_1.body)("username")
         .notEmpty({ "ignore_whitespace": true }).withMessage("el campo 'username' no puede estar vacio").bail()
         .custom((value, { req }) => __awaiter(void 0, void 0, void 0, function* () {
-        const user = (yield User_1.User.findOne({ username: value }).select({ contacts: 0, mailBox: 0, cellphone: 0, email: 0, document: 0 }));
+        const user = (yield User_1.User.findOne({ username: value }).select({
+            contacts: 0, mailBox: 0, cellphone: 0, email: 0, document: 0, FUNCIONARIO: 0, GERENTE: 0, DIRECTOR: 0, JEFE: 0
+        }));
         if (!user)
             throw new Error("Usuario inexistente");
         req.body.user = user;

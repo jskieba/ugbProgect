@@ -1,6 +1,8 @@
+import { NextFunction, Request, Response } from "express";
 import { body } from "express-validator";
 import { isObjectIdOrHexString } from "mongoose";
 import { Product } from "../database/models/Product";
+import { endpointResponse } from "../helpers/succes";
 
 export const addProdUgbChain = [
     body("productId")
@@ -46,3 +48,16 @@ export const updateUgbProductChain = [
             return true
         })
 ]
+
+export const checkProductId = async(req: Request, res:Response, next:NextFunction)=>{
+    const productId = req.params.productId
+    if(isObjectIdOrHexString(productId)){
+        if(await Product.findById(productId)){
+            next()
+        }else{
+            return endpointResponse({res, code:200, message:"Producto inexistente"})
+        }
+    }else{
+        return endpointResponse({res, code:400, message:"id de producto invalido"})
+    }
+}
