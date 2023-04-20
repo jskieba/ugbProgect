@@ -4,6 +4,7 @@ import { endpointResponse } from "../helpers/succes"
 import createHttpError from "http-errors"
 import { User } from "../database/models/User"
 import { cleanUserProfile } from "../helpers/helper"
+import mongoose from "mongoose"
 export const userList = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
     try {
         const limit:any = req.query.limit || "10"
@@ -135,9 +136,40 @@ export const userDetail = catchAsync(async (req:Request, res:Response, next:Next
 export const contactList = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
     try {
         let user = req.body.token
-        const myContacts:any = await User.findOne({username:user.username}).select({contacts:1}).populate({path:"contacts", select:{document:0, mailBox:0, contacts:0, cellphone:0, rol:0}})
+        const myContacts:any = await User.findOne({username:user.username}).select({contacts:1}).populate({path:"contacts", select:{document:0, mailBox:0, contacts:0, cellphone:0, rol:0, FUNCIONARIO:0, JEFE:0, DIRECTOR:0, GERENTE:0}})
         const contacts:[any]= myContacts.contacts
         return endpointResponse({res, code:200, message:"¡ lista de contactos !", body:{contacts:contacts?.map((contact:any)=>{return {idUser:contact._id, ...cleanUserProfile(contact.toJSON())}})}})
+    } catch (error:any) {
+        const httpError = createHttpError(
+            error.statusCode,
+            `[Error retrieving User Detail] - [ user/id - GET]: ${error.message}`
+        )
+        return next(httpError)
+    }
+})
+
+export const addContact = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
+    try {
+        const userId = req.body.userId
+        const user = req.body.token
+        await User.findOneAndUpdate({username:user.username},{$push:{contacts:new mongoose.Types.ObjectId(userId)}})
+        return endpointResponse({res, code:200, message:"¡ contacto añadido !"})
+    } catch (error:any) {
+        const httpError = createHttpError(
+            error.statusCode,
+            `[Error retrieving User Detail] - [ user/id - GET]: ${error.message}`
+        )
+        return next(httpError)
+    }
+})
+
+export const deleteContact = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
+    try {
+        let user = req.body.token
+        const userId = req.body.userId
+
+        await User.findOneAndUpdate({username:user.username},{$pull:{contacts:userId}})
+        return endpointResponse({res, code:200, message:"¡ contacto eliminado !"})
     } catch (error:any) {
         const httpError = createHttpError(
             error.statusCode,
