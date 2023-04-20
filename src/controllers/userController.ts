@@ -4,7 +4,6 @@ import { endpointResponse } from "../helpers/succes"
 import createHttpError from "http-errors"
 import { User } from "../database/models/User"
 import { cleanUserProfile } from "../helpers/helper"
-
 export const userList = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
     try {
         const limit:any = req.query.limit || "10"
@@ -123,6 +122,22 @@ export const userDetail = catchAsync(async (req:Request, res:Response, next:Next
         const username = req.params.username
         const user:any = await User.findOne({username}).select({mailBox:0, contacts:0})
         return endpointResponse({res, code:200, message:"¡ Detalle de Usuario!", body:{user:cleanUserProfile(user.toJSON())}})
+    } catch (error:any) {
+        const httpError = createHttpError(
+            error.statusCode,
+            `[Error retrieving User Detail] - [ user/id - GET]: ${error.message}`
+        )
+        return next(httpError)
+    }
+})
+
+
+export const contactList = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
+    try {
+        let user = req.body.token
+        const myContacts:any = await User.findOne({username:user.username}).select({contacts:1}).populate({path:"contacts", select:{document:0, mailBox:0, contacts:0, cellphone:0, rol:0}})
+        const contacts:[any]= myContacts.contacts
+        return endpointResponse({res, code:200, message:"¡ lista de contactos !", body:{contacts:contacts?.map((contact:any)=>{return {idUser:contact._id, ...cleanUserProfile(contact.toJSON())}})}})
     } catch (error:any) {
         const httpError = createHttpError(
             error.statusCode,

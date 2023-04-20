@@ -15,7 +15,7 @@ const messagesSchema = new Schema({
     versionKey:false
 })
 
-const userSchema = new Schema({
+export const userSchema = new Schema({
     "username":{type:String, unique:true, required:[true, "Nombre de usuario requerido"]},
     "firstname":{type:String, required:[true, "primer nombre requerido"]},
     "lastname":{type:String, required:[true, "apellido requerido"]},
@@ -30,7 +30,7 @@ const userSchema = new Schema({
     "GERENTE":{type:[Schema.Types.ObjectId], ref:"User"},
     "DIRECTOR":{type:[Schema.Types.ObjectId], ref:"User"},
     "mailBox":{type:[messagesSchema], default:[]},
-    "contacts":{type:Array<Schema.Types.ObjectId>, default:[], ref:"User"}
+    "contacts":{type:[Schema.Types.ObjectId], default:[], ref:"User"}
 },{
     collection:"UGB_User",
     versionKey:false
@@ -43,6 +43,7 @@ messagesSchema.plugin(mongooseHidden(),{ hidden:{deleted:true}})
 
 export const User = model("User",userSchema)
 export interface userDbInterface {
+    _id:String
     username:String,
     firstname:String,
     lastname:String,

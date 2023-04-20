@@ -1,15 +1,20 @@
 import { Router } from "express";
-import { deleteUser, funcionariosList, selfInfoUser, updateUser, userDetail, userList } from "../controllers/userController";
+import { contactList, deleteUser, funcionariosList, selfInfoUser, updateUser, userDetail, userList } from "../controllers/userController";
 import { queryChain } from "../middlewares/ugbMiddleware";
 import { checkRol, updateUserChain } from "../middlewares/userMiddleware";
 import validationHandlerMiddleware from "../middlewares/validationHandlerMiddleware";
 const router = Router()
 
-router.get("/list", queryChain, validationHandlerMiddleware, userList)
-router.get("/funcionarios", queryChain, validationHandlerMiddleware, funcionariosList)
 router.route("/")
     .get(selfInfoUser)
     .patch(updateUserChain, validationHandlerMiddleware, updateUser)
+
+router.get("/list", queryChain, validationHandlerMiddleware, userList)
+router.get("/funcionarios", queryChain, validationHandlerMiddleware, funcionariosList)
+router.route("/contacts")
+    .get(contactList)
+    .post()
+    .delete()
 
 router.route("/:username")
     .get(userDetail)
