@@ -6,6 +6,7 @@ import { userPositions, userRoles } from "../interfaces/interfaces";
 import { body } from "express-validator";
 import { User } from "../database/models/User";
 import { compareSync } from "bcrypt";
+import mongoose, { isObjectIdOrHexString } from "mongoose";
 const letters = "abcdefghijklmnñopqrstuvwxyz"
 const nums = "0123456789"
 
@@ -84,3 +85,21 @@ export const updateUserChain = [
     body("email").optional()
         .isEmail().withMessage("El campo 'email' debe contener un correo valido")
 ]
+
+export const addContactMiddleware = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const userId = req.body.userId
+        const user = req.body.token
+        if(!userId)return endpointResponse({res, code:400, message:"El campo 'userId' no debe estar vacio"})
+        if(!isObjectIdOrHexString(userId))return endpointResponse({res, code:400, message:"El campo 'userId' debe ser un id de usuario valido"})
+        if(!(await User.findById(userId)))return  endpointResponse({res, code:400, message:"No existe ese usuario"})
+        if((await User.findOne({username:user.username}))!.contacts.includes(new mongoose.Types.ObjectId(userId)))return endpointResponse({res, code:400, message:"Este usuario ya esta entre sus contactos"})
+        next()
+    } catch (error: any) {
+        const httpError = createHttpError(
+            error.statusCode,
+            `[Error retrieving check Rol Middleware]: ${error.message}`
+        )
+        return next(httpError)
+    }
+})
