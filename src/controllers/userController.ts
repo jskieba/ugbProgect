@@ -10,7 +10,7 @@ export const userList = catchAsync(async (req:Request, res:Response, next:NextFu
         const limit:any = req.query.limit || "10"
         const page:any = req.query.page || "0"
 
-        const users = (await User.find().limit(parseInt(limit)).skip(parseInt(page)).select({mailBox:0, contacts:0}))
+        const users = (await User.find({}).limit(parseInt(limit)).skip(parseInt(page)).select({mailBox:0, contacts:0}))
         .map(user=>{
             let cleanedUser:any = user.toJSON()
             cleanedUser = cleanUserProfile(cleanedUser)
@@ -21,6 +21,36 @@ export const userList = catchAsync(async (req:Request, res:Response, next:NextFu
         })
         return endpointResponse({res, code:200, message:"¡ Lista de usuarios !", body:{users, count:users.length}})
     } catch (error:any) {
+        const httpError = createHttpError(
+            error.statusCode,
+            `[Error retrieving User List] - [ user/list - GET]: ${error.message}`
+        )
+        return next(httpError)
+    }
+})
+
+export const funcionariosList = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
+    try {
+        const limit:any = req.query.limit || "10"
+        const page:any = req.query.page || "0"
+        let query = {}
+        if(req.query.withUgb === "true"){
+            query={"FUNCIONARIO":{$exists:true}}
+        }else if(req.query.withUgb === "false"){
+            query={"FUNCIONARIO":{$exists:false}}
+        }
+        const users = (await User.find({position:"FUNCIONARIO", ...query}).limit(parseInt(limit)).skip(parseInt(page)).select({mailBox:0, contacts:0}))
+        .map(user=>{
+            let cleanedUser:any = user.toJSON()
+            cleanedUser = cleanUserProfile(cleanedUser)
+            return {
+                ...cleanedUser,
+                userId:user._id.toString()
+            }
+        })
+        return endpointResponse({res, code:200, message:"¡ Lista de funcionarios !", body:{users, count:users.length}})
+    } catch (error:any) {
+        console.log(error)
         const httpError = createHttpError(
             error.statusCode,
             `[Error retrieving User List] - [ user/list - GET]: ${error.message}`
